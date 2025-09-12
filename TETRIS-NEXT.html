@@ -196,7 +196,7 @@
 	<source src="./res/drop.mp3" type="audio/mpeg">
   </audio>
   
-  <h1>Tetris Next</h1>
+  <h1 onclick="toggleControls()">Tetris Next</h1>
   
   <div class="canvas-wrapper">
     <canvas id="tetris" width="240" height="400"></canvas>
@@ -229,7 +229,14 @@
 	buttons.forEach(btn => {
 		btn.addEventListener("click", () => { btn.blur(); });
 	});
-  
+
+	
+	//gestione visibilita pulsanti
+	let currentControlsVisibility = true;//default
+	function toggleControls(){
+		currentControlsVisibility = !currentControlsVisibility;
+		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = currentControlsVisibility ? 'block':'none';});
+	}
   
 	const canvas = document.getElementById('tetris');
     const context = canvas.getContext('2d');
@@ -1571,6 +1578,7 @@
   </script>
 </body>
 </html>
+
 
 
 
