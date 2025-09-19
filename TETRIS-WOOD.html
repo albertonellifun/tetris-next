@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Tetris Next</title>
+  <style>
+    body {
+      background: #111;
+      color: #fec;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+	  justify-content: center;
+      user-select: none;
+      margin: 0;
+      height: 98%;
+	  height: calc(100vh - 10px);
+	  text-align: center;
+	  overflow: hidden;
+	  font-size: 16px;
+	  text-shadow: 2px 2px 4px #000;
+    }
+	
+    .canvas-wrapper {
+      display: flex;
+      align-items: center;
+	  justify-content: center;
+      gap: 10px;
+	  flex: 1;
+    }
+
+    canvas {
+      background: #222;
+      image-rendering: pixelated;
+      border-radius: 6px;
+      display: block;
+    }
+
+    .controls {
+	  display: flex;
+	  justify-content: center;
+	  flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+	
+	h1, .controls, .canvas-wrapper {
+	  padding: 6px 12px;
+	  margin: 3px;
+      background: url('./res/wood_bg.png');
+      background-repeat: repeat;
+      border-radius: 12px;
+	  width: calc(100% - 80px);
+	  overflow: hidden;
+	}
+	
+	.right-wrapper {
+	  display: flex; 
+	  flex-direction: column;
+	  justify-content: space-between;
+	  height: 100%;
+	  width: auto;
+	  min-width: 56px;
+	  max-width: 112px;
+	}
+	
+	@media(min-width:700px) {
+		.right-wrapper {
+			width: 15%;
+			max-width: 15%;
+		}
+	}
+	
+	@media(max-width:700px) {
+		h1, button {
+			height: 25px;
+		}
+		h1, .val, key {
+			line-height: 25px;
+		}
+		
+		#tetris {
+			max-width: 70%;
+		}
+	}
+	
+	#tetris {
+		width: auto;
+		height: 100%;
+	}
+	
+	#next {
+		width: 100%;
+		height: auto;
+		max-height: 20%;
+	}
+	#stats {
+		width: 100%;
+		height: auto;
+		max-height: 75%;
+	}
+	
+	button {
+      background: #444;
+      padding: 24px;
+      color: #fec;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+	  flex: 1;
+	  white-space: nowrap;
+	  touch-action: manipulation; 
+	  background: url(./res/wood_black.png);
+    }
+	
+	.full {
+		flex: 1 1 100%;
+	}
+	
+	.small {
+		padding: 2px 12px;
+	}
+	
+	.highlight {
+		background: #fff;
+		color: #444;
+		border: 1px solid #000;
+		background: url(./res/wood_white.png);
+	}
+	
+	button:active {
+      background: #666;
+	  background: url(./res/wood_black.png);
+    }
+	
+	
+	
+	#scanlines-overlay {
+	  display:none;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  right: 0;
+	  bottom: 0;
+	  pointer-events: none;
+	  background: repeating-linear-gradient(
+		transparent,
+		transparent 0px,
+		rgba(0, 0, 0, 0.5) 1px,
+		transparent 2px
+	  );
+	  background-size: 100% 4px;
+	  opacity: 1;
+	}
+	
+	button:focus {
+	  outline: none;
+	  box-shadow: none;
+	}
+	
+	.command {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.key {
+		margin-left: -10px;
+	}
+	.val {
+		margin-right: -10px;
+		color: #fec;
+		background: #666;
+		padding: 0px 8px;	
+		background: url(./res/wood_brown.png)
+	}
+  </style>
+</head>
+<body>
+  <div id="scanlines-overlay"></div>
+  
+  <audio id="creditSound" preload="auto">
+	<source src="./res/wood_block_3.mp3" xxxsrc="./res/credit.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="bgMusic" loop preload="auto">
+	<source src="./res/loginska.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="gameOverSound" preload="auto">
+	<source src="./res/wood_block_3.mp3" xxxsrc="./res/gameover.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="rowSound" preload="auto">
+	<source src="./res/wood_block_1.mp3" xxxsrc="./res/row.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="dropSound" preload="auto">
+	<source src="./res/wood_block_2.mp3" xxxsrc="./res/drop.mp3" type="audio/mpeg">
+  </audio>
+  
+  <h1 onclick="toggleControls()">Tetris Next - Wood Edition</h1>
+  
+  <div class="canvas-wrapper">
+    <canvas id="tetris" width="240" height="400"></canvas>
+	<div class="right-wrapper">
+		<canvas id="next" width="140" height="100"></canvas>
+		<canvas id="stats" width="140" height="400"></canvas>
+	</div>
+  </div>
+
+  <div class="controls">
+    <button type="button" id="moveLeft"		class="highlight" 	disabled="disabled"		alt="LEFT ARROW"	onclick="playerMove(-1)">←</button>
+    <button type="button" id="rotate"		class="highlight" 	disabled="disabled"		alt="UP ARROW"		onclick="playerRotate(1)">↻</button>
+	<button type="button" id="moveRight"	class="highlight" 	disabled="disabled"		alt="RIGHT ARROW"	onclick="playerMove(1)">→</button>
+    <button type="button" id="drop"			class="highlight" 	disabled="disabled"		alt="DOWN ARROW"	onclick="playerDrop()">↓</button>
+	<button type="button" id="dropAll"		class="highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
+	<div class="full"></div>
+	<button type="button" id="startGame" 		class="small highlight"	alt="ENTER" onclick="startGame();this.blur();">▶ START</button>
+	<button type="button" id="changePalette" 	style="display:none;" class="small command"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
+	<button type="button" id="changeSkin" 		style="display:none;" class="small command"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
+	<button type="button" id="changeRainbow" 	class="small command"	alt="R" 	onclick="changeRainbow()"><span class="key">RAINBOW</span><span class="val">0</span></button>
+	<button type="button" id="muteSound" 		class="small command"	alt="M" 	onclick="muteSound()"><span class="key">MUTE</span><span class="val">false</span></button>
+	<button type="button" id="changeScanLines"	class="small command"	alt="C" 	onclick="changeScanLines()"><span class="key">SCANLINES</span><span class="val">false</span></button>
+	<button type="button" id="changeSepia"		style="display:none;" class="small command"	alt="E" 	onclick="changeSepia()"><span class="key">SEPIA</span><span class="val">false</span></button>
+	<button type="button" id="scramble"			class="small highlight"	alt="R" 	onclick="scramble()"><span class="key">SCRAMBLE!</button>
+  </div>
+
+  <script>
+	const buttons = document.querySelectorAll("button");
+
+	buttons.forEach(btn => {
+		btn.addEventListener("click", () => { btn.blur(); });
+	});
+	
+	//gestione visibilita pulsanti
+	let currentControlsVisibility = true;//default
+	function toggleControls(){
+		currentControlsVisibility = !currentControlsVisibility;
+		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = currentControlsVisibility ? 'block':'none';});
+	}
+  
+  
+	const canvas = document.getElementById('tetris');
+    const context = canvas.getContext('2d');
+    //context.scale(20, 20);
+
+    const nextCanvas = document.getElementById('next');
+    const nextCtx = nextCanvas.getContext('2d');
+    //nextCtx.scale(20, 20);
+	
+	const statsCanvas = document.getElementById('stats');
+	const statsCtx = statsCanvas.getContext('2d');
+    //statsCtx.scale(20, 20);
+	
+	const blockSize = 20; //20px per blocco
+	
+	const colorsSoft = [
+	  {col:'#444',bor:'#222',borInt:'#000'}, //null==nero
+	  {col:'#e66',bor:'#c44',borInt:'#a22'}, // I = rosso
+	  {col:'#ff3',bor:'#dd0',borInt:'#bb0'}, // J = gialla
+	  {col:'#c7d',bor:'#a5b',borInt:'#839'}, // L = viola
+	  {col:'#04a',bor:'#028',borInt:'#006'}, // O = blu
+	  {col:'#08c',bor:'#06a',borInt:'#048'}, // S - azzurro
+	  {col:'#9c7',bor:'#7a5',borInt:'#583'}, // T = verde
+	  {col:'#d96',bor:'#b74',borInt:'#952'}, // Z - arancione
+	  {col:'#fff',bor:'#ddd',borInt:'#bbb'}, //BIANCO
+	];
+	
+	//disegno dei blocchi
+	let currentSkin = 0;
+	const skinList = [ drawRealWoodBlocks ];
+   
+	//colore dei blocchi
+	let currentPalette = 0;
+	const paletteList = [ colorsSoft ];
+
+	let colors = paletteList[ currentPalette ];
+	
+	//colore dei blocchi random o arcobaleno orizzontale/verticale/diagonale
+	let currentRainbowMode = 0;
+	
+	//gestione scramble
+	function scramble(){
+		let max = arena.length - 1;//19
+		let min = arena.length / 2;//10
+		//riempie
+		for (let y = max; y > min; y--) {
+			for (let x = 0; x < arena[y].length; x++) {
+				let rnd = (Math.random() * 16) | 0;
+				arena[y][x] = rnd > 8 ? 0 : rnd;
+			}
+		}
+		//svuota la parte superiore
+		for (let y = min; y >= 0; y--) {
+			for (let x = 0; x < arena[y].length; x++) {
+				arena[y][x] = 0;
+			}
+		}
+		draw();
+	}
+	
+	//gestione scanlines on/off
+	let scanLinesEnabled = false;
+	function changeScanLines() {
+		scanLinesEnabled = !scanLinesEnabled;
+		document.querySelector('#changeScanLines .val').innerText = scanLinesEnabled;
+		if (scanLinesEnabled) {
+			document.getElementById('scanlines-overlay').style.display = 'block';
+		} else {
+			document.getElementById('scanlines-overlay').style.display = 'none';
+		}
+	}
+	
+	//gestione sepia on/off
+	let sepiaEnabled = false;
+	function changeSepia() {
+		sepiaEnabled = !sepiaEnabled;
+		document.querySelector('#changeSepia .val').innerText = sepiaEnabled;
+		if (sepiaEnabled) {
+			document.body.style.filter = "sepia(1)";
+		} else {
+			document.body.style.filter = "sepia(0)";
+		}
+	}
+	
+	
+	//gestione mute sound on/off
+	let isMute = false;
+	
+	function muteSound() {
+		isMute = !isMute;
+		document.querySelector('#muteSound .val').innerText = isMute;
+		if (isMute) {
+			stopMusic();
+		} else if (gameover == false) {
+			startMusic(false);
+		}
+	}
+	
+	let dropCounter = 0;
+    let dropInterval = 1000;
+    let lastTime = 0;
+	let nextType = null;
+	let musicStarted = false;
+	let gameover = true;
+	
+	let arenaStats = createMatrix(7, 20);
+	let arenaNext = createMatrix(7, 5);
+    let arena = createMatrix(12, 20);
+	let linesCleared = 0;
+	
+    const player = {
+      pos: { x: 0, y: 0 },
+      matrix: null,
+    };
+	
+	function prevSkin() {
+		currentSkin = (currentSkin - 1);
+		if(currentSkin < 0) currentSkin = skinList.length - 1;
+		draw();
+		drawNext();
+		drawStats();
+		document.querySelector('#changeSkin .val').innerText = currentSkin;
+	}
+	
+	function changeSkin() {
+		currentSkin = (currentSkin + 1) % skinList.length;
+		draw();
+		drawNext();
+		drawStats();
+		document.querySelector('#changeSkin .val').innerText = currentSkin;
+	}
+	
+	function changePalette() {
+		currentPalette = (currentPalette + 1) % paletteList.length;
+		colors = paletteList[currentPalette];
+		draw();
+		drawNext();
+		drawStats();
+		document.querySelector('#changePalette .val').innerText = currentPalette;
+	}
+	
+	
+	
+	//blocchi di legno realistici
+	const imageSources = [
+		"./res/wood_black.png",  	//null==nero
+		"./res/wood_red.png",		// I = rosso
+		"./res/wood_yellow.png",	// J = gialla
+		"./res/wood_violet.png",	// L = viola
+		"./res/wood_blue.png",		// O = blu
+		"./res/wood_cyan.png",		// S - azzurro
+		"./res/wood_green.png",		// T = verde
+		"./res/wood_orange.png",	// Z - arancione
+		"./res/wood_white.png"];	//BIANCO
+	const images = [];
+	const patterns = [];
+	let loadedCount = 0;
+	imageSources.forEach((src, index) => {
+		const img = new Image();
+		img.src = src;
+		img.onload = () => {
+			patterns[index] = context.createPattern(img, "repeat");
+			loadedCount++;
+		};
+		images[index] = img;
+	});
+	
+	function drawRealWoodBlocks(ctx, px, py, value) {
+	  // riempi con texture di legno
+	  if (patterns) {
+		ctx.fillStyle = patterns[value];
+	  } else {
+		ctx.fillStyle = colors[value].col; // fallback se la texture non è ancora caricata
+	  }
+	  ctx.fillRect(px * blockSize, py * blockSize, 1 * blockSize, 1 * blockSize);
+
+	  // bordo nero per separare i pezzi
+	  ctx.strokeStyle = "#000";
+	  ctx.lineWidth = 0.05 * blockSize;
+	  ctx.strokeRect(px * blockSize, py * blockSize, 1 * blockSize, 1 * blockSize);
+
+	  // effetto 3D con luci/ombre
+	  ctx.strokeStyle = colors[value].bor;
+	  ctx.beginPath();
+	  ctx.moveTo(px * blockSize, py * blockSize + 0.05 * blockSize);
+	  ctx.lineTo(px * blockSize + 1 * blockSize, py * blockSize + 0.05 * blockSize);
+	  ctx.stroke();
+	  ctx.beginPath();
+	  ctx.moveTo(px * blockSize + 0.05 * blockSize, py * blockSize);
+	  ctx.lineTo(px * blockSize + 0.05 * blockSize, py * blockSize + 1 * blockSize);
+	  ctx.stroke();
+
+	  ctx.strokeStyle = colors[value].borInt;
+	  ctx.beginPath();
+	  ctx.moveTo(px * blockSize, py * blockSize + 0.95* blockSize);
+	  ctx.lineTo(px * blockSize + 1, py * blockSize + 0.95* blockSize);
+	  ctx.stroke();
+	  ctx.beginPath();
+	  ctx.moveTo(px * blockSize + 0.95* blockSize, py * blockSize);
+	  ctx.lineTo(px * blockSize + 0.95* blockSize, py * blockSize + 1* blockSize);
+	  ctx.stroke();
+	}
+	
+	
+	
+	function arenaSweep() {
+	  let linesToClear = [];
+	
+	  // Trova le righe complete
+	  for (let y = arena.length - 1; y >= 0; y--) {
+		if (arena[y].every(value => value !== 0)) {
+		  linesToClear.push(y);
+		}
+	  }
+	
+	  if (linesToClear.length > 0) {
+		let flashCount = 0;
+		const maxFlashes = 6; // numero di "cambi" (bianco/nero)
+		
+		const flashInterval = setInterval(() => {
+		  linesToClear.forEach(y => {
+			arena[y].fill(flashCount % 2 === 0 ? 8 : 0);// alterna bianco/nero
+		  });
+
+		  draw(); // ridisegna la scena
+		  flashCount++;
+
+		  if (flashCount > maxFlashes) {
+			clearInterval(flashInterval);
+
+			// rimuovi le righe dopo l'ultimo flash (ex: 19, 18, 16)
+			let yaggiustamento = 0;//se rimuovo 19 -> 18 e 16 diventano 19 e 17
+			linesToClear.forEach((y) => {
+			  const row = arena.splice(y + yaggiustamento, 1)[0].fill(0);//prende la riga y e la riempie di zeri
+              arena.unshift(row);//la rimette in cima tutta piena di zeri
+			  linesCleared++;
+			  dropInterval = Math.max(100, dropInterval - (linesCleared * 1.25)); // velocità minima: 100ms
+			  console.log(`Velocità: ${dropInterval}ms`);
+			  yaggiustamento++;//fix n righe con la I
+			  if ((linesCleared%5) == 0) changeSkin();
+			});
+			draw();
+		  }
+		}, 50); // 50 ms tra un flash e l'altro
+	  }
+	
+	  if(linesToClear.length) {
+			// piccolo delay per separare i suoni
+			for (let i = 0; i < linesToClear.length; i++) {
+				setTimeout(() => playSound('rowSound'), i * 200);
+			}
+			
+			//aggiorna stats
+			statistiche['TOT'] = statistiche['TOT'] + linesToClear.length;
+			statistiche['PTS'] = statistiche['PTS'] + 
+				( linesToClear.length == 1 ? 50 : linesToClear.length == 2 ? 150 : linesToClear.length == 3 ? 400 : linesToClear.length == 4 ? 900 : 0);
+			drawStats();
+		}
+    }
+	
+	
+
+    function collide(arena, player) {
+      const [m, o] = [player.matrix, player.pos];
+      for (let y = 0; y < m.length; y++) {
+        for (let x = 0; x < m[y].length; x++) {
+          if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+			return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function createMatrix(w, h) {
+      const matrix = [];
+      while (h--) matrix.push(new Array(w).fill(0));
+      return matrix;
+    }
+
+    function createPiece(type) {
+		if (currentRainbowMode == 4) return createPieceRainbow(type);
+		switch(type) {
+			case 'I' : return [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]];
+			case 'J' : return [[2,0,0],[2,2,2],[0,0,0]];
+			case 'L' : return [[0,0,3],[3,3,3],[0,0,0]];
+			case 'O' : return [[4,4],[4,4]];
+			case 'S' : return [[0,5,5],[5,5,0],[0,0,0]];
+			case 'T' : return [[0,6,0],[6,6,6],[0,0,0]];
+			case 'Z' : return [[7,7,0],[0,7,7],[0,0,0]];
+			default: return null;
+		}
+    }
+	
+	function rand() {
+		return ((Math.random()*7)|0)+1;
+	}
+	
+	function createPieceRainbow(type) {
+		switch(type) {
+			case 'I' : return [[0,0,0,0],[rand(),rand(),rand(),rand()],[0,0,0,0],[0,0,0,0]];
+			case 'J' : return [[rand(),0,0],[rand(),rand(),rand()],[0,0,0]];
+			case 'L' : return [[0,0,rand()],[rand(),rand(),rand()],[0,0,0]];
+			case 'O' : return [[rand(),rand()],[rand(),rand()]];
+			case 'S' : return [[0,rand(),rand()],[rand(),rand(),0],[0,0,0]];
+			case 'T' : return [[0,rand(),0],[rand(),rand(),rand()],[0,0,0]];
+			case 'Z' : return [[rand(),rand(),0],[0,rand(),rand()],[0,0,0]];
+			default: return null;
+		}
+    }
+	
+	function drawMatrixToContext(matrix, offset, ctx, drawNulls) {
+      matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0 || drawNulls) {
+			const px = x + offset.x;
+			const py = y + offset.y;
+			
+			if (value !== 0 && drawNulls && currentRainbowMode > 0 && currentRainbowMode < 4) {
+				value = currentRainbowMode == 3 ? ((px + py) % 7) + 1 //arcobaleno diagonale
+					: currentRainbowMode == 2 ? value = ((py) % 7) + 1 //arcobaleno orizzontale
+					: value = ((px) % 7) + 1;//arcobaleno verticale
+			}
+
+			skinList[currentSkin]?.(ctx, px, py, value);
+          }
+        });
+      });
+    }
+	
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawMatrixToContext(arena, { x: 0, y: 0 }, context, true);
+      drawMatrixToContext(player.matrix, player.pos, context, false);
+    }
+
+    function merge(arena, player) {
+	  playSound('dropSound');
+      player.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            arena[y + player.pos.y][x + player.pos.x] = value;
+          }
+        });
+      });
+    }
+
+	function playerDropDown() {
+	  if(gameover) return;
+		while (!collide(arena, player)) { player.pos.y++; }
+		player.pos.y--;
+		merge(arena, player);
+		playerReset();
+		arenaSweep();
+		dropCounter = 0;
+	}
+
+    function playerDrop() {
+	  if(gameover) return;
+      player.pos.y++;
+      if (collide(arena, player)) {
+		player.pos.y--;
+        merge(arena, player);
+        playerReset();
+        arenaSweep();
+      }
+      dropCounter = 0;
+    }
+
+    function playerMove(dir) {
+	  if(gameover) return;
+      player.pos.x += dir;
+      if (collide(arena, player)) {
+        player.pos.x -= dir;
+      }
+    }
+
+    function playerRotate(dir) {
+	  if(gameover) return;
+      const pos = player.pos.x;
+      let offset = 1;
+      rotate(player.matrix, dir);
+      while (collide(arena, player)) {
+        player.pos.x += offset;
+        offset = -(offset + (offset > 0 ? 1 : -1));
+        if (offset > player.matrix[0].length) {
+          rotate(player.matrix, -dir);
+          player.pos.x = pos;
+          return;
+        }
+      }
+    }
+
+    function rotate(matrix, dir) {
+	  if(gameover) return;
+      for (let y = 0; y < matrix.length; y++) {
+        for (let x = 0; x < y; x++) {
+          [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+        }
+      }
+      if (dir > 0) matrix.forEach(row => row.reverse());
+      else matrix.reverse();
+    }
+
+    function update(time = 0) {
+	  if(gameover) return;
+      const deltaTime = time - lastTime;
+      lastTime = time;
+      dropCounter += deltaTime;
+      if (dropCounter > dropInterval) playerDrop();
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    function drawNext() {
+	  if(gameover) return;
+      nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+      drawMatrixToContext(arenaNext, { x: 0, y: 0 }, nextCtx, true);
+	  const matrix = createPiece(nextType);
+      drawMatrixToContext(matrix, { x: 1, y: 2 }, nextCtx, false);
+	  //NEXT
+	  nextCtx.fillStyle = colors[8].col;
+	  nextCtx.font = (0.6 * blockSize)+"px Arial Bold";
+	  nextCtx.textAlign = "left";
+	  nextCtx.textBaseline = "middle";
+	  nextCtx.fillText("NEXT", 0.2 * blockSize, 0.6 * blockSize);
+    }
+
+	//gestione statistiche
+	let statistiche = null;
+	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7 };
+	
+	function resetStats() {
+		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0};
+	}
+	
+	function drawStatsBG() {
+		statsCtx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
+		let idx = 2;
+		for (let key in statistiche) {
+			if(key !== 'TOT' && key !== 'PTS') {
+				let color = colorMap[key] ?? 0;
+				arenaStats[idx][1] = color;
+				idx+=2;
+			} else {
+				arenaStats[idx][1] = 8;
+				idx+=2;
+			}
+		}
+		drawMatrixToContext(arenaStats, { x: 0, y: 0 }, statsCtx, true);
+	}
+	
+	function drawStatsFG() {
+		//STATS
+		statsCtx.fillStyle = colors[8].col;
+		statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText("STATS", 0.2 * blockSize, 0.6 * blockSize);
+	
+		//BLOCKS
+		let idx = 2;
+		for (let key in statistiche) {
+			if(key !== 'TOT' && key !== 'PTS') {
+				let color = colorMap[key] ?? 0;
+				statsCtx.fillStyle = colors[color].col;
+				statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
+				statsCtx.textAlign = "left";
+				statsCtx.textBaseline = "middle";
+				statsCtx.fillText(" → " + statistiche[key] + " BLOCKS", 2 * blockSize, idx * blockSize + 0.6 * blockSize);
+				idx+=2;
+			}
+		}
+		
+		//ROWS/POINTS
+		statsCtx.fillStyle = colors[8].col;
+		statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText(" → "+statistiche['TOT'] + " ROWS", 2 * blockSize, idx * blockSize + 0.6 * blockSize);
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText(" → "+statistiche['PTS'] + " PTS", 2 * blockSize, idx * blockSize + 2.6 * blockSize);
+	}
+	
+	function drawStats() {
+		drawStatsBG();
+		drawStatsFG();
+	}   
+
+    function playerReset() {
+      if (!nextType) {
+        nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
+      }
+	  
+	  statistiche[nextType]++;
+	  drawStats();
+	  
+      player.matrix = createPiece(nextType);
+      player.pos.y = 0;
+      player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+      nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
+      drawNext();
+      if (collide(arena, player)) {
+		gameOver();
+      }
+    }
+	
+	
+	function playSound(id) {
+	  if (isMute) return;
+	  const audio = document.getElementById(id);
+	  if (audio) {
+		audio.currentTime = 0;
+		audio.play().catch((e) => {
+		  console.warn("Errore riproduzione audio:", e);
+		});
+	  }
+	}
+	
+	function stopMusic() {
+		if (!musicStarted) return;
+		const music = document.getElementById("bgMusic");
+		if (music) {
+			music.pause();
+			musicStarted = false;
+		}
+	}
+	
+	function startMusic(fromBeginning = true) {
+		if (isMute) return;
+		if (musicStarted) return;
+		const music = document.getElementById("bgMusic");
+		if (music) {
+		  music.volume = 0.5;
+		  if (fromBeginning) music.currentTime = 0;
+		  music.play().catch((e) => {
+			console.warn("🔇 bgMusic bloccata:", e);
+		  });
+		  musicStarted = true;
+		}
+	}
+	
+	function playGameOver() {
+		if (isMute) return;
+		const gameOverSound = document.getElementById("gameOverSound");
+		if (gameOverSound) {
+		  gameOverSound.volume = 0.5;
+		  gameOverSound.play().catch((e) => {
+			console.warn("🔇 gameOverSound bloccata:", e);
+		  });
+		}
+	}
+
+    
+	function disableButtons(val){
+		//start invertito
+		document.getElementById('startGame').disabled=!val;
+
+		document.getElementById('moveLeft').disabled=val;
+		document.getElementById('rotate').disabled=val;
+		document.getElementById('moveRight').disabled=val;
+		document.getElementById('drop').disabled=val;
+		document.getElementById('dropAll').disabled=val;
+	}
+	
+	function changeRainbow() {
+		currentRainbowMode = (currentRainbowMode + 1) % 5;
+		document.querySelector('#changeRainbow .val').innerText = currentRainbowMode;
+	}
+	
+	document.addEventListener('keydown', event => {
+		//console.log(event.code + ' ' + event.key);
+		     if (event.code === 'ArrowLeft') playerMove(-1);
+		else if (event.code === 'ArrowRight') playerMove(1);
+		else if (event.code === 'ArrowUp') playerRotate(1);
+		else if (event.code === 'ArrowDown') playerDrop();
+		else if (event.code === 'Space') playerDropDown();
+		else if (event.code === 'Enter' || event.code === 'Digit1') startGame();
+		//barbatrucchi vari
+		else if (event.code === 'KeyS') changeSkin();
+		else if (event.code === 'KeyD') prevSkin();
+		else if (event.code === 'KeyR') changeRainbow();
+		else if (event.code === 'KeyP') changePalette();
+		else if (event.code === 'KeyM') muteSound();
+		else if (event.code === 'KeyE') changeSepia();
+		else if (event.code === 'KeyC') changeScanLines();
+		else if (event.code === 'KeyA') scramble();
+	});
+	
+	function gameOver() {
+		gameover = true;
+		stopMusic();
+		playGameOver();
+        disableButtons(true);
+	}
+	
+	
+	function startGame() {
+		if (!gameover) return;
+		playSound('creditSound');		
+		setTimeout(function(){
+			disableButtons(false);
+			gameover=false;
+			
+			dropCounter = 0;
+			dropInterval = 1000;
+			lastTime = 0;
+			linesCleared = 0;
+			nextType = null;
+			musicStarted = false;
+		
+			arenaStats = createMatrix(7, 20);
+			arenaNext = createMatrix(7, 5);
+			arena = createMatrix(12, 20);
+			
+			arenaStats.forEach(row => row.fill(0));
+			arenaNext.forEach(row => row.fill(0));
+			arena.forEach(row => row.fill(0));
+				
+			resetStats();
+			drawStatsBG();
+			
+			playerReset();
+			update();
+			startMusic();
+			}, 500);
+	}
+  </script>
+</body>
+</html>
