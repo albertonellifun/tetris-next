@@ -350,7 +350,7 @@
 	
 	//disegno dei blocchi
 	let currentSkin = 0;
-	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks ];
+	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawTetrisBlocks, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks ];
    
 	//colore dei blocchi
 	let currentPalette = 0;
@@ -1067,7 +1067,6 @@
 		const cy = py + 0.05;
 
 		if (value !== 0) {
-			
 			// flare a croce
 			ctx.strokeStyle = "rgba(255,255,255,0.5)";
 			ctx.lineWidth = 0.07;
@@ -1096,7 +1095,6 @@
 			ctx.arc(cx, cy, 0.4, 0, Math.PI * 2);
 			ctx.fill();
 		}
-
 		
 		// riflesso diagonale (vetro tagliato)
 		ctx.strokeStyle = "rgba(255,255,255,0.3)";
@@ -1107,31 +1105,62 @@
 		ctx.stroke();
 	}
 	
-    function arenaSweepOLD() {
-	  let rowsClearedThisTurn = 0;
 	
-      outer: for (let y = arena.length - 1; y >= 0; y--) {
-        for (let x = 0; x < arena[y].length; x++) {
-          if (arena[y][x] === 0) continue outer;
-        }
-        const row = arena.splice(y, 1)[0].fill(0);
-        arena.unshift(row);
-		linesCleared++;
-		rowsClearedThisTurn++;
-		dropInterval = Math.max(100, dropInterval - (linesCleared * 1.25)); // velocità minima: 100ms
-		console.log(`Velocità: ${dropInterval}ms`);
-		
-		y++;//fix N righe con la I
-		if ((linesCleared%5) == 0) changeSkin();
-      }
-	  
-	  for (let i = 0; i < rowsClearedThisTurn; i++) {
-        setTimeout(() => playSound('rowSound'), i * 230); // piccolo delay per separare i suoni
-      }
-	  
-	  statistiche['TOT']++;
+	//ispirato al tetris ufficiale moderno 
+    function drawTetrisBlocks(ctx, px, py, value) {
+      const baseColor   = colors[value].col;
+	  const darkenColor = colors[value].borInt;
+      const borderColor = '#000';   // bordo esterno
+      const outerFrame  = '#222';   // cornice esterna scura
+      
+      // impostazioni del bordo interno
+      const inset = 0.08;           // distanza del bordo interno
+      const innerLineWidth = 0.04;  // spessore del bordo interno
+    
+      ctx.save();
+    
+      // 1) cornice esterna scura
+      ctx.fillStyle = outerFrame;
+      ctx.fillRect(px, py, 1, 1);
+    
+      // 2) corpo interno con gradiente
+      const gx = px + inset, gy = py + inset;
+      const gw = 1 - inset * 2, gh = 1 - inset * 2;
+    
+      const grad = ctx.createLinearGradient(gx, gy, gx, gy + gh);
+      grad.addColorStop(0, lightenColor(baseColor, 0.28)); // più chiaro sopra
+      grad.addColorStop(0.45, baseColor);
+      grad.addColorStop(1, darkenColor);  // più scuro sotto
+      ctx.fillStyle = grad;
+      ctx.fillRect(gx, gy, gw, gh);
+    
+      // 3) bordo interno
+      ctx.lineWidth = innerLineWidth;
+      ctx.strokeStyle = darkenColor;
+      ctx.strokeRect(gx, gy, gw, gh);
+    
+      // 4) highlight rettangolare sottile in alto
+      ctx.fillStyle = "rgba(255,255,255,0.14)";
+      ctx.fillRect(gx + 0.02, gy + 0.02, gw - 0.04, gh * 0.18);
+    
+      // 5) bordo esterno
+      ctx.lineWidth = 0.06;
+      ctx.strokeStyle = borderColor;
+      ctx.strokeRect(px, py, 1, 1);
+    
+      // 6) riflesso lucido superiore (curva bianca)
+      ctx.beginPath();
+      ctx.moveTo(gx + gw * 0.12, gy + gh * 0.22);
+      ctx.quadraticCurveTo(px + 0.5, py + 0.06, gx + gw * 0.88, gy + gh * 0.22);
+      ctx.quadraticCurveTo(px + 0.5, gy + gh * 0.35, gx + gw * 0.12, gy + gh * 0.22);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255,255,255,0.36)";
+      ctx.fill();
+      
+      ctx.restore();
     }
 	
+	//cancellazione righe piene
 	function arenaSweep() {
 	  let linesToClear = [];
 	
@@ -1261,8 +1290,6 @@
       context.clearRect(0, 0, canvas.width, canvas.height);
       drawMatrixToContext(arena, { x: 0, y: 0 }, context, true);
       drawMatrixToContext(player.matrix, player.pos, context, false);
-	  
-	  //drawScanlines(context, canvas);//XXX
     }
 
     function merge(arena, player) {
@@ -1355,8 +1382,6 @@
 	  nextCtx.textAlign = "left";
 	  nextCtx.textBaseline = "middle";
 	  nextCtx.fillText("NEXT", 0.2, 0.6);
-	  
-	  //drawScanlines(nextCtx, nextCanvas);//XXX
     }
 
 	//gestione statistiche
@@ -1419,8 +1444,6 @@
 	function drawStats() {
 		drawStatsBG();
 		drawStatsFG();
-		
-		//drawScanlines(statsCtx, statsCanvas);//XXX
 	}   
 
     function playerReset() {
@@ -1530,21 +1553,8 @@
         disableButtons(true);
 	}
 	
-	function drawScanlines(ctx, canvas) {
-	  const lineSpacing = 0.2;  // Distanza tra le linee delle scanlines
-	  const lineHeight = 0.1;   // Altezza delle linee
-
-	  ctx.strokeStyle = 'rgba(0, 0, 0, 0.33)';  // Colore delle scanlines
-	  ctx.lineWidth = lineHeight;
-
-	  for (let y = 0; y < canvas.height; y += lineSpacing) {
-		ctx.beginPath();
-		ctx.moveTo(0, y);
-		ctx.lineTo(canvas.width, y);
-		ctx.stroke();
-	  }
-	}
-
+	
+	
 	
 	function startGame() {
 		if (!gameover) return;
@@ -1579,10 +1589,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
