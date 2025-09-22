@@ -1,5 +1,5 @@
 # Tetris Next
-Tetris game in HTML CSS and JavaScript Legacy 
+Tetris game in HTML CSS and JavaScript Legacy - also available in "Wood Edition" ;)
 
 ## Licenza
 
