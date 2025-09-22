@@ -177,6 +177,9 @@
 		padding: 0px 8px;	
 		background: url(./res/wood_brown.png)
 	}
+	.hidden { 
+		display: none !important; 
+	}
   </style>
 </head>
 <body>
@@ -214,14 +217,14 @@
 	<button type="button" id="moveRight"	class="highlight" 	disabled="disabled"		alt="RIGHT ARROW"	onclick="playerMove(1)">→</button>
     <button type="button" id="drop"			class="highlight" 	disabled="disabled"		alt="DOWN ARROW"	onclick="playerDrop()">↓</button>
 	<button type="button" id="dropAll"		class="highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
+	<button type="button" id="startGame" 	class="highlight"							alt="ENTER" 		onclick="startGame();this.blur();">▶ START</button>
 	<div class="full"></div>
-	<button type="button" id="startGame" 		class="small highlight"	alt="ENTER" onclick="startGame();this.blur();">▶ START</button>
-	<button type="button" id="changePalette" 	style="display:none;" class="small command"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
-	<button type="button" id="changeSkin" 		style="display:none;" class="small command"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
+	<button type="button" id="changePalette" 	class="small command"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
+	<button type="button" id="changeSkin" 		class="small command"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
 	<button type="button" id="changeRainbow" 	class="small command"	alt="R" 	onclick="changeRainbow()"><span class="key">RAINBOW</span><span class="val">0</span></button>
 	<button type="button" id="muteSound" 		class="small command"	alt="M" 	onclick="muteSound()"><span class="key">MUTE</span><span class="val">false</span></button>
 	<button type="button" id="changeScanLines"	class="small command"	alt="C" 	onclick="changeScanLines()"><span class="key">SCANLINES</span><span class="val">false</span></button>
-	<button type="button" id="changeSepia"		style="display:none;" class="small command"	alt="E" 	onclick="changeSepia()"><span class="key">SEPIA</span><span class="val">false</span></button>
+	<button type="button" id="changeSepia"		class="small command"	alt="E" 	onclick="changeSepia()"><span class="key">SEPIA</span><span class="val">false</span></button>
 	<button type="button" id="scramble"			class="small highlight"	alt="R" 	onclick="scramble()"><span class="key">SCRAMBLE!</button>
   </div>
 
@@ -233,12 +236,18 @@
 	});
 	
 	//gestione visibilita pulsanti
-	let currentControlsVisibility = true;//default
+	let currentControlsVisibility = 0;//default
 	function toggleControls(){
-		currentControlsVisibility = !currentControlsVisibility;
-		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = currentControlsVisibility ? 'block':'none';});
-		if(!currentControlsVisibility) document.documentElement.requestFullscreen();
-		else document.exitFullscreen();
+		currentControlsVisibility = (currentControlsVisibility + 1) % 4;
+		//0 = no full screen, controls visible
+		//1 = no full screen, controls hidden
+		//2 = full screen, controls visible
+		//3 = full screen, controls hidden
+		let controlsVisible = currentControlsVisibility % 2 == 0;
+		let fullScreen = currentControlsVisibility > 1;
+		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = controlsVisible ? 'block':'none';});
+		if(fullScreen) document.documentElement.requestFullscreen();
+		else if(document.fullscreenElement) document.exitFullscreen();
 	}
   
   
@@ -871,10 +880,4 @@
 	}
   </script>
 </body>
-
 </html>
-
-
-
-
-
