@@ -246,7 +246,7 @@
 		//3 = full screen, controls hidden
 		let controlsVisible = currentControlsVisibility % 2 == 0;
 		let fullScreen = currentControlsVisibility > 1;
-		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = controlsVisible ? 'block':'none';});
+		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = controlsVisible ? 'flex':'none';});
 		if(fullScreen) document.documentElement.requestFullscreen();
 		else if(document.fullscreenElement) document.exitFullscreen();
 	}
@@ -1601,3 +1601,4 @@
   </script>
 </body>
 </html>
+
