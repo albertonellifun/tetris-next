@@ -192,13 +192,13 @@
 	<source src="./res/loginska.mp3" type="audio/mpeg">
   </audio>
   <audio id="gameOverSound" preload="auto">
-	<source src="./res/wood_block_3.mp3" xxxsrc="./res/gameover.mp3" type="audio/mpeg">
+	<source src="./res/wood_block_3.mp3" type="audio/mpeg">
   </audio>
   <audio id="rowSound" preload="auto">
-	<source src="./res/wood_block_1.mp3" xxxsrc="./res/row.mp3" type="audio/mpeg">
+	<source src="./res/wood_block_1.mp3" type="audio/mpeg">
   </audio>
   <audio id="dropSound" preload="auto">
-	<source src="./res/wood_block_2.mp3" xxxsrc="./res/drop.mp3" type="audio/mpeg">
+	<source src="./res/wood_block_2.mp3" type="audio/mpeg">
   </audio>
   
   <h1 onclick="toggleControls()">Tetris Next - Wood Edition</h1>
@@ -219,13 +219,13 @@
 	<button type="button" id="dropAll"		class="highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
 	<button type="button" id="startGame" 	class="highlight"							alt="ENTER" 		onclick="startGame();this.blur();">▶ START</button>
 	<div class="full"></div>
-	<button type="button" id="changePalette" 	class="small command"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
-	<button type="button" id="changeSkin" 		class="small command"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
-	<button type="button" id="changeRainbow" 	class="small command"	alt="R" 	onclick="changeRainbow()"><span class="key">RAINBOW</span><span class="val">0</span></button>
-	<button type="button" id="muteSound" 		class="small command"	alt="M" 	onclick="muteSound()"><span class="key">MUTE</span><span class="val">false</span></button>
-	<button type="button" id="changeScanLines"	class="small command"	alt="C" 	onclick="changeScanLines()"><span class="key">SCANLINES</span><span class="val">false</span></button>
-	<button type="button" id="changeSepia"		class="small command"	alt="E" 	onclick="changeSepia()"><span class="key">SEPIA</span><span class="val">false</span></button>
-	<button type="button" id="scramble"			class="small highlight"	alt="R" 	onclick="scramble()"><span class="key">SCRAMBLE!</button>
+	<button type="button" id="changePalette" 	class="small command hidden"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
+	<button type="button" id="changeSkin" 		class="small command hidden"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
+	<button type="button" id="changeRainbow" 	class="small command"			alt="R" 	onclick="changeRainbow()"><span class="key">RAINBOW</span><span class="val">0</span></button>
+	<button type="button" id="muteSound" 		class="small command"			alt="M" 	onclick="muteSound()"><span class="key">MUTE</span><span class="val">false</span></button>
+	<button type="button" id="changeScanLines"	class="small command"			alt="C" 	onclick="changeScanLines()"><span class="key">SCANLINES</span><span class="val">false</span></button>
+	<button type="button" id="changeSepia"		class="small command hidden"	alt="E" 	onclick="changeSepia()"><span class="key">SEPIA</span><span class="val">false</span></button>
+	<button type="button" id="scramble"			class="small highlight"			alt="R" 	onclick="scramble()"><span class="key">SCRAMBLE!</button>
   </div>
 
   <script>
@@ -881,4 +881,3 @@
   </script>
 </body>
 </html>
-
