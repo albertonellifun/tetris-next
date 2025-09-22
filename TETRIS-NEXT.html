@@ -47,7 +47,7 @@
 	
 	h1, .controls, .canvas-wrapper {
 	  padding: 6px 12px;
-	  margin: 6px;
+	  margin: 3px;
       background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet, red);
       background-size: 400% 400%;
       animation: rainbow 16s linear infinite;
@@ -74,6 +74,10 @@
 	}
 	
 	@media(max-width:700px) {
+		h1, .controls, .canvas-wrapper {
+			margin: 2px;
+			width: calc(100% - 40px);
+		}
 		h1, button {
 			height: 25px;
 		}
@@ -104,7 +108,7 @@
 	
 	button {
       background: #444;
-      padding: 32px;
+      padding: 24px;
       color: white;
       border-radius: 6px;
       cursor: pointer;
@@ -350,7 +354,7 @@
 	
 	//disegno dei blocchi
 	let currentSkin = 0;
-	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawTetrisBlocks, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks ];
+	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks, drawTetrisBlocks ];
    
 	//colore dei blocchi
 	let currentPalette = 0;
