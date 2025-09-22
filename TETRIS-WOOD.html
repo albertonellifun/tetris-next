@@ -238,7 +238,7 @@
 		currentControlsVisibility = !currentControlsVisibility;
 		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = currentControlsVisibility ? 'block':'none';});
 		if(!currentControlsVisibility) document.documentElement.requestFullscreen();
-		else document.documentElement.exitFullscreen();
+		else document.exitFullscreen();
 	}
   
   
@@ -873,6 +873,7 @@
 </body>
 
 </html>
+
 
 
 
