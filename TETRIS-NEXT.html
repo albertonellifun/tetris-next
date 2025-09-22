@@ -886,7 +886,7 @@
 		ctx.fill();
 
 		// Bordo traslucido
-		ctx.strokeStyle = "rgba(255,255,255,0.3)";
+		ctx.strokeStyle = "rgba(255,255,255,0.1)";
 		ctx.lineWidth = 0.05;
 		ctx.stroke();
 
@@ -1120,57 +1120,52 @@
 	
 	//ispirato al tetris ufficiale moderno 
     function drawTetrisBlocks(ctx, px, py, value) {
-      const baseColor   = colors[value].col;
+	  const baseColor   = colors[value].col;
 	  const darkenColor = colors[value].borInt;
-      const borderColor = '#000';   // bordo esterno
-      const outerFrame  = '#222';   // cornice esterna scura
-      
-      // impostazioni del bordo interno
-      const inset = 0.08;           // distanza del bordo interno
-      const innerLineWidth = 0.04;  // spessore del bordo interno
-    
-      ctx.save();
-    
-      // 1) cornice esterna scura
-      ctx.fillStyle = outerFrame;
-      ctx.fillRect(px, py, 1, 1);
-    
-      // 2) corpo interno con gradiente
-      const gx = px + inset, gy = py + inset;
-      const gw = 1 - inset * 2, gh = 1 - inset * 2;
-    
-      const grad = ctx.createLinearGradient(gx, gy, gx, gy + gh);
-      grad.addColorStop(0, lightenColor(baseColor, 0.28)); // più chiaro sopra
-      grad.addColorStop(0.45, baseColor);
-      grad.addColorStop(1, darkenColor);  // più scuro sotto
-      ctx.fillStyle = grad;
-      ctx.fillRect(gx, gy, gw, gh);
-    
-      // 3) bordo interno
-      ctx.lineWidth = innerLineWidth;
-      ctx.strokeStyle = darkenColor;
-      ctx.strokeRect(gx, gy, gw, gh);
-    
-      // 4) highlight rettangolare sottile in alto
-      ctx.fillStyle = "rgba(255,255,255,0.14)";
-      ctx.fillRect(gx + 0.02, gy + 0.02, gw - 0.04, gh * 0.18);
-    
-      // 5) bordo esterno
-      ctx.lineWidth = 0.06;
-      ctx.strokeStyle = borderColor;
-      ctx.strokeRect(px, py, 1, 1);
-    
-      // 6) riflesso lucido superiore (curva bianca)
-      ctx.beginPath();
-      ctx.moveTo(gx + gw * 0.12, gy + gh * 0.22);
-      ctx.quadraticCurveTo(px + 0.5, py + 0.06, gx + gw * 0.88, gy + gh * 0.22);
-      ctx.quadraticCurveTo(px + 0.5, gy + gh * 0.35, gx + gw * 0.12, gy + gh * 0.22);
-      ctx.closePath();
-      ctx.fillStyle = "rgba(255,255,255,0.36)";
-      ctx.fill();
-      
-      ctx.restore();
-    }
+	  const borderColor = '#222';
+
+	  // dimensioni interne
+	  const inset = 0.08;
+	  const gx = px + inset, gy = py + inset;
+	  const gw = 1 - inset * 2, gh = 1 - inset * 2;
+
+	  ctx.save();
+
+	  // corpo con gradiente verticale più dettagliato
+	  const grad = ctx.createLinearGradient(gx, gy, gx, gy + gh);
+	  if(value !== 0) grad.addColorStop(0, lightenColor(baseColor, 0.33));  // chiaro sopra
+	  grad.addColorStop(0.45, baseColor);                   // colore pieno al centro
+	  grad.addColorStop(1, darkenColor);                    // scuro sotto
+	  ctx.fillStyle = grad;
+	  ctx.fillRect(gx, gy, gw, gh);
+
+	  // bordo interno sottile
+	  ctx.lineWidth = 0.04;
+	  ctx.strokeStyle = darkenColor;
+	  ctx.strokeRect(gx, gy, gw, gh);
+
+	  // highlight superiore
+	  ctx.fillStyle = "rgba(255,255,255, 0.18)";
+	  ctx.fillRect(gx + 0.04, gy + 0.04, gw - 0.08, gh * 0.25);
+
+	  // bordo esterno scuro
+	  ctx.lineWidth = 0.06;
+	  ctx.strokeStyle = borderColor;
+	  ctx.strokeRect(px, py, 1, 1);
+
+	  // 6) riflesso lucido superiore (curva bianca)
+	  if(value !== 0) {
+		  ctx.beginPath();
+		  ctx.moveTo(gx + gw * 0.12, gy + gh * 0.22);
+		  ctx.quadraticCurveTo(px + 0.5, py + 0.06, gx + gw * 0.88, gy + gh * 0.22);
+		  ctx.quadraticCurveTo(px + 0.5, gy + gh * 0.35, gx + gw * 0.12, gy + gh * 0.22);
+		  ctx.closePath();
+		  ctx.fillStyle = '#fff';
+		  ctx.fill();
+	  }
+	  ctx.restore();
+	}
+
 	
 	//cancellazione righe piene
 	function arenaSweep() {
@@ -1437,7 +1432,7 @@
 				statsCtx.font = "0.6px Arial Bold";
 				statsCtx.textAlign = "left";
 				statsCtx.textBaseline = "middle";
-				statsCtx.fillText(" → " + statistiche[key] + " BLOCKS", 2, idx+0.6);
+				statsCtx.fillText(" " + key + " → " + statistiche[key] + " BLOCKS", 2, idx+0.6);
 				idx+=2;
 			}
 		}
@@ -1601,5 +1596,3 @@
   </script>
 </body>
 </html>
-
-
