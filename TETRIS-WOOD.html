@@ -949,54 +949,62 @@
 	//gestione swipe su mobile
 	let startX = 0;
 	let startY = 0;
+	const SWIPE_THRESHOLD_Y = window.innerHeight / 10;
+	const SWIPE_THRESHOLD_X = window.innerWidth / 30;
 
-	//setta start x/y con la posizione iniziale del dito
+	//eventi touch
 	canvas.addEventListener("touchstart", e => {
 		if(gameover) return;
 		startX = e.touches[0].clientX; 
 		startY = e.touches[0].clientY;
 	});
 
-	//ruota al click
 	canvas.addEventListener("click", e => {
 		if(gameover) return;
 		playerRotate(1);
 	});
 
-	//ridisegna durante spostamento
-	canvas.addEventListener("touchmove", e => {
+	canvas.addEventListener("touchend", e => {
 		if(gameover) return;
 		const endX = e.changedTouches[0].clientX;
 		const endY = e.changedTouches[0].clientY;
 
-		if((endY-startY)<(window.innerHeight/-10)) { playerRotate(1); startY=endY; }
-		else if((endY-startY)>(window.innerHeight/10)) { playerDropDown(); startY=endY; }
-		else if(Math.abs(startX-endX)>(window.innerWidth/25)) handleSwipe(endX-canvas.offsetLeft);
+		const deltaX = endX - startX;
+		const deltaY = endY - startY;
+
+		//swipe verticale
+		if(deltaY < -SWIPE_THRESHOLD_Y) {
+			playerRotate(1); // swipe su → ruota
+		} else if(deltaY > SWIPE_THRESHOLD_Y) {
+			playerDropDown(); // swipe giù → drop
+		}
+
+		//swipe orizzontale
+		if(Math.abs(deltaX) > SWIPE_THRESHOLD_X) {
+			handleSwipe(endX - canvas.offsetLeft);
+		}
+
+		//aggiorna start per il prossimo gesto
+		startX = endX;
+		startY = endY;
 	});
 
-	//quando lascio -> resetta start x/y
-	canvas.addEventListener("touchend", e => {
-		startX = e.changedTouches[0].clientX;
-		startY = e.changedTouches[0].clientY;
-	});
-
-	//gestione swipe
+	//gestione swipe orizzontale
 	function handleSwipe(x) {
-		//calcola la colonna quando lascio
 		const colWidth = canvas.width / 12;
 		const targetCol = Math.floor(x / colWidth);
-		
-		let oldPlayerPosX = player.pos.x;
-		
+
+		const oldPlayerPosX = player.pos.x;
 		player.pos.x = targetCol;
+
 		if (collide(arena, player)) {
-		  //in caso di collisione rimettilo dove era precedentemente
-		  player.pos.x = oldPlayerPosX;
+			player.pos.x = oldPlayerPosX;//torna indietro se collide
 		}
-		//ridisegna il canvas
-		draw(); 
+
+		draw();//ridisegna
 	}	
   </script>
 </body>
 </html>
+
 
