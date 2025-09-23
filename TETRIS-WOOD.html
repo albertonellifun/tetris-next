@@ -256,15 +256,12 @@
   
 	const canvas = document.getElementById('tetris');
     const context = canvas.getContext('2d');
-    //context.scale(20, 20);
 
     const nextCanvas = document.getElementById('next');
     const nextCtx = nextCanvas.getContext('2d');
-    //nextCtx.scale(20, 20);
 	
 	const statsCanvas = document.getElementById('stats');
 	const statsCtx = statsCanvas.getContext('2d');
-    //statsCtx.scale(20, 20);
 	
 	const blockSize = 20; //20px per blocco
 	
@@ -358,7 +355,7 @@
 	let musicStarted = false;
 	let gameover = true;
 	
-	let arenaStats = createMatrix(7, 20);
+	let arenaStats = createMatrix(7, 22);
 	let arenaNext = createMatrix(7, 5);
     let arena = createMatrix(12, 20);
 	let linesCleared = 0;
@@ -686,7 +683,7 @@
 	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7 };
 	
 	function resetStats() {
-		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0};
+		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':0};
 	}
 	
 	function drawStatsBG() {
@@ -741,7 +738,7 @@
 		statsCtx.fillStyle = colors[7].col;
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2, idx+4.6);
+		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2 * blockSize, idx * blockSize + 4.6 * blockSize);
 	}
 	
 	function drawStats() {
@@ -889,7 +886,7 @@
 			nextType = null;
 			musicStarted = false;
 		
-			arenaStats = createMatrix(7, 20);
+			arenaStats = createMatrix(7, 22);
 			arenaNext = createMatrix(7, 5);
 			arena = createMatrix(12, 20);
 			
