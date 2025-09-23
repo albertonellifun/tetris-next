@@ -1450,7 +1450,7 @@
 	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7 };
 	
 	function resetStats() {
-		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':statistiche['HIGH']};
+		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':0};
 	}
 	
 	function drawStatsBG() {
@@ -1628,13 +1628,14 @@
 	function gameOver() {
 		gameover = true;
 		stopMusic();
-		playGameOver();
-        disableButtons(true);
+		disableButtons(true);
 		//HIGHSCORE
 		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
 			statistiche['HIGH'] = statistiche['PTS'];
 			setCookie("TetrisNext-HighScore", statistiche['HIGH'], 365)
-			setTimeout(function(){ playHighScore();},2200);
+			playHighScore();
+		} else {
+			playGameOver();
 		}
 	}
 	
@@ -1718,4 +1719,3 @@
   </script>
 </body>
 </html>
-
