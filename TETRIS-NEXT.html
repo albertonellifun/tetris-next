@@ -194,6 +194,10 @@
   <audio id="gameOverSound" preload="auto">
 	<source src="./res/gameover.mp3" type="audio/mpeg">
   </audio>
+  <audio id="highScoreSound" preload="auto">
+	<source src="./res/highscore.mp3" type="audio/mpeg">
+  </audio>
+  
   <audio id="rowSound" preload="auto">
 	<source src="./res/row.mp3" type="audio/mpeg">
   </audio>
@@ -207,7 +211,7 @@
     <canvas id="tetris" width="240" height="400"></canvas>
 	<div class="right-wrapper">
 		<canvas id="next" width="140" height="100"></canvas>
-		<canvas id="stats" width="140" height="400"></canvas>
+		<canvas id="stats" width="140" height="440"></canvas>
 	</div>
   </div>
 
@@ -362,7 +366,7 @@
 	
 	//disegno dei blocchi
 	let currentSkin = 0;
-	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks, drawTetrisBlocks ];
+	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawTetrisBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks, drawTetrisRoundedBlocks ];
    
 	//colore dei blocchi
 	let currentPalette = 0;
@@ -438,7 +442,7 @@
 	let musicStarted = false;
 	let gameover = true;
 	
-	let arenaStats = createMatrix(7, 20);
+	let arenaStats = createMatrix(7, 22);
 	let arenaNext = createMatrix(7, 5);
     let arena = createMatrix(12, 20);
 	let linesCleared = 0;
@@ -1116,7 +1120,58 @@
 		ctx.lineTo(px + 0.8, py + 0.8);
 		ctx.stroke();
 	}
-	
+
+	//play tetris come
+	function drawTetrisRoundedBlocks(ctx, px, py, value) {
+	  const baseColor = colors[value].bor; // colore principale
+	  const darkenColor = value === 0 ? '#333' : colors[value].borInt; // bordo scuro
+	  const lightenColor = colors[value].col; //colore chiaro
+	  const radius = 0.3; // raggio degli angoli
+	  
+	  const highlightHeight = 0.15;
+      const highlightCurve  = 0.6;
+	  const highlightOpacity= value === 0 ? 0.3 : 0.75;
+      
+	  ctx.save();
+	  
+	  // corpo arrotondato con gradiente ---
+	  const grad = ctx.createLinearGradient(px, py, px, py + 1);
+	  grad.addColorStop(0, lightenColor);
+	  grad.addColorStop(0.75, baseColor);
+	  grad.addColorStop(1, darkenColor);
+	  ctx.fillStyle = grad;
+	  
+	  // path con angoli arrotondati
+	  ctx.beginPath();
+	  ctx.moveTo(px + radius, py);
+	  ctx.lineTo(px + 1 - radius, py);
+	  ctx.quadraticCurveTo(px + 1, py, px + 1, py + radius);
+	  ctx.lineTo(px + 1, py + 1 - radius);
+	  ctx.quadraticCurveTo(px + 1, py + 1, px + 1 - radius, py + 1);
+	  ctx.lineTo(px + radius, py + 1);
+	  ctx.quadraticCurveTo(px, py + 1, px, py + 1 - radius);
+	  ctx.lineTo(px, py + radius);
+	  ctx.quadraticCurveTo(px, py, px + radius, py);
+	  ctx.closePath();
+	  ctx.fill();
+	  
+	  // bordo esterno ---
+	  ctx.lineWidth = 0.1;
+	  ctx.strokeStyle = darkenColor;
+	  ctx.stroke();
+	  
+	  // highlight superiore curvo ---
+	  ctx.beginPath();
+	  ctx.moveTo(px + 0.15, py + highlightHeight);
+      ctx.quadraticCurveTo(px + 0.5, py + highlightCurve, px + 0.85, py + highlightHeight);
+      ctx.quadraticCurveTo(px + 0.5, py + highlightHeight * 0.5, px + 0.15, py + highlightHeight);
+      ctx.closePath();
+	  ctx.fillStyle = "rgba(255,255,255,"+highlightOpacity+")";
+	  ctx.fill();
+	  
+	  ctx.restore();
+	  }
+	  
 	
 	//ispirato al tetris ufficiale moderno 
     function drawTetrisBlocks(ctx, px, py, value) {
@@ -1396,18 +1451,19 @@
 	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7 };
 	
 	function resetStats() {
-		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0};
+		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':0};
 	}
 	
 	function drawStatsBG() {
 		statsCtx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
 		let idx = 2;
 		for (let key in statistiche) {
-			if(key !== 'TOT' && key !== 'PTS') {
+			//HIGHSCORE da mostrare in stats
+			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
 				let color = colorMap[key] ?? 0;
 				arenaStats[idx][1] = color;
 				idx+=2;
-			} else {
+			} else if (key !== 'HIGH') {
 				arenaStats[idx][1] = 8;
 				idx+=2;
 			}
@@ -1426,7 +1482,7 @@
 		//BLOCKS
 		let idx = 2;
 		for (let key in statistiche) {
-			if(key !== 'TOT' && key !== 'PTS') {
+			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
 				let color = colorMap[key] ?? 0;
 				statsCtx.fillStyle = colors[color].col;
 				statsCtx.font = "0.6px Arial Bold";
@@ -1446,6 +1502,11 @@
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
 		statsCtx.fillText(" → "+statistiche['PTS'] + " PTS", 2, idx+2.6);
+		//HIGHSCORE
+		statsCtx.fillStyle = colors[7].col;
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2, idx+4.6);
 	}
 	
 	function drawStats() {
@@ -1516,6 +1577,17 @@
 		  });
 		}
 	}
+	
+	function playHighScore() {
+		if (isMute) return;
+		const highScoreSound = document.getElementById("highScoreSound");
+		if (highScoreSound) {
+		  highScoreSound.volume = 0.5;
+		  highScoreSound.play().catch((e) => {
+			console.warn("🔇 highScoreSound bloccata:", e);
+		  });
+		}
+	}
 
     
 	function disableButtons(val){
@@ -1558,6 +1630,12 @@
 		stopMusic();
 		playGameOver();
         disableButtons(true);
+		//HIGHSCORE
+		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
+			statistiche['HIGH'] = statistiche['PTS'];
+			setCookie("highScore", statistiche['HIGH'], 365)
+			setTimeout(function(){ playHighScore();},800);
+		}
 	}
 	
 	
@@ -1577,7 +1655,7 @@
 			nextType = null;
 			musicStarted = false;
 		
-			arenaStats = createMatrix(7, 20);
+			arenaStats = createMatrix(7, 22);
 			arenaNext = createMatrix(7, 5);
 			arena = createMatrix(12, 20);
 			
@@ -1591,8 +1669,56 @@
 			playerReset();
 			update();
 			startMusic();
+			
+			//HIGHSCORE
+			let highScore = 0;
+			let savedHigh = getCookie("TetrisNext-HighScore");
+			if (savedHigh) {
+				try{
+					highScore = parseInt(savedHigh);
+				} catch(e) {
+				}
+				statistiche['HIGH'] = highScore;
+			}
+			
 			}, 500);
 	}
+	
+	
+	
+	//HIGHSCORE scrive cookie
+    function setCookie(name, value, days) {
+	  try{
+		let d = new Date();
+		d.setTime(d.getTime() + (days*24*60*60*1000));
+		let expires = "expires=" + d.toUTCString();
+		document.cookie = name + "=" + value + ";" + expires + ";path=/";
+	  }catch(e){
+		console.log(e);
+	  }
+    }
+    
+    //HIGHSCORE legge cookie
+    function getCookie(name) {
+	  try{
+        let cname = name + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+          let c = ca[i].trim();
+          if (c.indexOf(cname) === 0) {
+            return c.substring(cname.length, c.length);
+          }
+        }
+        return "";
+	  }catch(e){
+	    console.log(e);
+	  }
+    }
+
+	
+	
+	
   </script>
 </body>
 </html>
