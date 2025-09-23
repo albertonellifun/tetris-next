@@ -1015,7 +1015,7 @@
 
 			const cols = 12;
 			const colWidth = canvas.width / cols;
-			let targetCol = Math.floor(relativeX / colWidth);
+			let targetCol = Math.floor(0.1 + relativeX / colWidth);//aggiungo un infinitesimo altrimenti difficile target=0
 			targetCol = Math.max(0, Math.min(cols - 1, targetCol));
 
 			if (targetCol !== lastTargetCol) {
@@ -1086,6 +1086,7 @@
   </script>
 </body>
 </html>
+
 
 
 
