@@ -194,6 +194,9 @@
   <audio id="gameOverSound" preload="auto">
 	<source src="./res/wood_block_3.mp3" type="audio/mpeg">
   </audio>
+  <audio id="highScoreSound" preload="auto">
+	<source src="./res/highscore.mp3" type="audio/mpeg">
+  </audio>
   <audio id="rowSound" preload="auto">
 	<source src="./res/wood_block_1.mp3" type="audio/mpeg">
   </audio>
@@ -207,7 +210,7 @@
     <canvas id="tetris" width="240" height="400"></canvas>
 	<div class="right-wrapper">
 		<canvas id="next" width="140" height="100"></canvas>
-		<canvas id="stats" width="140" height="400"></canvas>
+		<canvas id="stats" width="140" height="440"></canvas>
 	</div>
   </div>
 
@@ -690,11 +693,12 @@
 		statsCtx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
 		let idx = 2;
 		for (let key in statistiche) {
-			if(key !== 'TOT' && key !== 'PTS') {
+			//HIGHSCORE da mostrare in stats
+			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
 				let color = colorMap[key] ?? 0;
 				arenaStats[idx][1] = color;
 				idx+=2;
-			} else {
+			} else if (key !== 'HIGH') {
 				arenaStats[idx][1] = 8;
 				idx+=2;
 			}
@@ -733,6 +737,11 @@
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
 		statsCtx.fillText(" → "+statistiche['PTS'] + " PTS", 2 * blockSize, idx * blockSize + 2.6 * blockSize);
+		//HIGHSCORE
+		statsCtx.fillStyle = colors[7].col;
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2, idx+4.6);
 	}
 	
 	function drawStats() {
@@ -803,6 +812,18 @@
 		  });
 		}
 	}
+	
+	//HIGHSCORE
+	function playHighScore() {
+		if (isMute) return;
+		const highScoreSound = document.getElementById("highScoreSound");
+		if (highScoreSound) {
+		  highScoreSound.volume = 0.5;
+		  highScoreSound.play().catch((e) => {
+			console.warn("🔇 highScoreSound bloccata:", e);
+		  });
+		}
+	}
 
     
 	function disableButtons(val){
@@ -845,6 +866,12 @@
 		stopMusic();
 		playGameOver();
         disableButtons(true);
+		//HIGHSCORE
+		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
+			statistiche['HIGH'] = statistiche['PTS'];
+			setCookie("highScore", statistiche['HIGH'], 365)
+			setTimeout(function(){ playHighScore();},800);
+		}
 	}
 	
 	
@@ -876,8 +903,52 @@
 			playerReset();
 			update();
 			startMusic();
+			
+			//HIGHSCORE
+			let highScore = 0;
+			let savedHigh = getCookie("TetrisNext-HighScore");
+			if (savedHigh) {
+				try{
+					highScore = parseInt(savedHigh);
+				} catch(e) {
+				}
+				statistiche['HIGH'] = highScore;
+			}
+			
 			}, 500);
 	}
+	
+	
+	
+	//HIGHSCORE scrive cookie
+    function setCookie(name, value, days) {
+	  try{
+		let d = new Date();
+		d.setTime(d.getTime() + (days*24*60*60*1000));
+		let expires = "expires=" + d.toUTCString();
+		document.cookie = name + "=" + value + ";" + expires + ";path=/";
+	  }catch(e){
+		console.log(e);
+	  }
+    }
+    
+    //HIGHSCORE legge cookie
+    function getCookie(name) {
+	  try{
+        let cname = name + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+          let c = ca[i].trim();
+          if (c.indexOf(cname) === 0) {
+            return c.substring(cname.length, c.length);
+          }
+        }
+        return "";
+	  }catch(e){
+	    console.log(e);
+	  }
+    }	
   </script>
 </body>
 </html>
