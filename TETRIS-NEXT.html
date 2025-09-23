@@ -1712,7 +1712,59 @@
 	  }catch(e){
 	    console.log(e);
 	  }
-    }	
+    }
+
+
+	//gestione swipe su mobile
+	let startX = 0;
+	let startY = 0;
+
+	//setta start x/y con la posizione iniziale del dito
+	canvas.addEventListener("touchstart", e => {
+		if(gameover) return;
+		startX = e.touches[0].clientX; 
+		startY = e.touches[0].clientY;
+	});
+
+	//ruota al click
+	canvas.addEventListener("click", e => {
+		if(gameover) return;
+		playerRotate(1);
+	});
+
+	//ridisegna durante spostamento
+	canvas.addEventListener("touchmove", e => {
+		if(gameover) return;
+		const endX = e.changedTouches[0].clientX;
+		const endY = e.changedTouches[0].clientY;
+
+		if((endY-startY)<-50) { playerRotate(1); startY=endY; }
+		else if((endY-startY)>50) { playerDropDown(); startY=endY; }
+		else if(Math.abs(startX-endX)>20) handleSwipe(endX-canvas.offsetLeft);
+	});
+
+	//quando lascio -> resetta start x/y
+	canvas.addEventListener("touchend", e => {
+		startX = e.changedTouches[0].clientX;
+		startY = e.changedTouches[0].clientY;
+	});
+
+	//gestione swipe
+	function handleSwipe(x) {
+		//calcola la colonna quando lascio
+		const colWidth = canvas.width / 12;
+		const targetCol = Math.floor(x / colWidth);
+		
+		let oldPlayerPosX = player.pos.x;
+		
+		player.pos.x = targetCol;
+		if (collide(arena, player)) {
+		  //in caso di collisione rimettilo dove era precedentemente
+		  player.pos.x = oldPlayerPosX;
+		}
+		//ridisegna il canvas
+		draw(); 
+	}
   </script>
 </body>
 </html>
