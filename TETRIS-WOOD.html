@@ -680,7 +680,7 @@
 
 	//gestione statistiche
 	let statistiche = null;
-	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7 };
+	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7, TOT:8, PTS:8, HIGH:7 };
 	
 	function resetStats() {
 		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':0};
@@ -691,12 +691,9 @@
 		let idx = 2;
 		for (let key in statistiche) {
 			//HIGHSCORE da mostrare in stats
-			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
+			if(key !== 'HIGH') {
 				let color = colorMap[key] ?? 0;
 				arenaStats[idx][1] = color;
-				idx+=2;
-			} else if (key !== 'HIGH') {
-				arenaStats[idx][1] = 8;
 				idx+=2;
 			}
 		}
