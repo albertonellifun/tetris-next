@@ -867,7 +867,7 @@
 		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
 			statistiche['HIGH'] = statistiche['PTS'];
 			setCookie("highScore", statistiche['HIGH'], 365)
-			setTimeout(function(){ playHighScore();},800);
+			setTimeout(function(){ playHighScore();},2000);
 		}
 	}
 	
@@ -949,3 +949,4 @@
   </script>
 </body>
 </html>
+
