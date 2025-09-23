@@ -714,7 +714,7 @@
 		//BLOCKS
 		let idx = 2;
 		for (let key in statistiche) {
-			if(key !== 'TOT' && key !== 'PTS') {
+			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
 				let color = colorMap[key] ?? 0;
 				statsCtx.fillStyle = colors[color].col;
 				statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
@@ -866,8 +866,8 @@
 		//HIGHSCORE
 		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
 			statistiche['HIGH'] = statistiche['PTS'];
-			setCookie("highScore", statistiche['HIGH'], 365)
-			setTimeout(function(){ playHighScore();},2000);
+			setCookie("TetrisNext-HighScore", statistiche['HIGH'], 365)
+			setTimeout(function(){ playHighScore();},2200);
 		}
 	}
 	
@@ -949,4 +949,3 @@
   </script>
 </body>
 </html>
-
