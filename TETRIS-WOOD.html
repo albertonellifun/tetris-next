@@ -949,62 +949,143 @@
 	//gestione swipe su mobile
 	let startX = 0;
 	let startY = 0;
-	const SWIPE_THRESHOLD_Y = window.innerHeight / 10;
+	let gesture = null;//orizzontale o verticale
+	let verticalHandled = false;//
+	let lastTargetCol = null;//
+
+	let longPressTimeout = null;//timer per riconoscere il long press
+	let softDropInterval = null;//timer per soft drop continuo
+	let longPressActive = false;//se siamo in modalità long press
+
+	const SWIPE_THRESHOLD_Y = window.innerHeight / 5;
 	const SWIPE_THRESHOLD_X = window.innerWidth / 30;
+	const TAP_THRESHOLD = 10; 
 
-	//eventi touch
+	const LONG_PRESS_DELAY = 400;//ms per attivare il long press
+	const SOFT_DROP_INTERVAL = 100;//ms tra un soft drop e l’altro
+
+	//inizio tocco
 	canvas.addEventListener("touchstart", e => {
-		if(gameover) return;
-		startX = e.touches[0].clientX; 
-		startY = e.touches[0].clientY;
-	});
+		if (gameover) return;
+		const t = e.touches[0];
+		startX = t.clientX;
+		startY = t.clientY;
+		gesture = null;
+		verticalHandled = false;
+		lastTargetCol = player.pos.x;
 
-	canvas.addEventListener("click", e => {
-		if(gameover) return;
-		playerRotate(1);
-	});
+		//avvia timer long press
+		longPressTimeout = setTimeout(() => {
+			longPressActive = true;
+			softDropInterval = setInterval(() => {
+				if (!gameover) playerDropSoft(); //funzione che fa scendere di 1 riga
+			}, SOFT_DROP_INTERVAL);
+		}, LONG_PRESS_DELAY);
 
+		e.preventDefault();
+	}, { passive: false });
+
+	//movimento dito
+	canvas.addEventListener("touchmove", e => {
+		if (gameover) return;
+		const t = e.touches[0];
+		const curX = t.clientX;
+		const curY = t.clientY;
+		const deltaX = curX - startX;
+		const deltaY = curY - startY;
+
+		//se c'e' movimento, annulla il long press
+		if (Math.abs(deltaX) > TAP_THRESHOLD || Math.abs(deltaY) > TAP_THRESHOLD) {
+			clearTimeout(longPressTimeout);
+			if (!gesture) {
+				if (Math.abs(deltaY) > SWIPE_THRESHOLD_Y && Math.abs(deltaY) > Math.abs(deltaX)) {
+					gesture = 'vertical';
+				} else if (Math.abs(deltaX) > SWIPE_THRESHOLD_X && Math.abs(deltaX) > Math.abs(deltaY)) {
+					gesture = 'horizontal';
+				}
+			}
+		}
+		
+		//swipe orizzontale continuo
+		if (gesture === 'horizontal') {
+			const rect = canvas.getBoundingClientRect();
+			//scala posizione touch in coordinate canvas
+			const scaleX = canvas.width / rect.width;
+			const relativeX = (curX - rect.left) * scaleX;
+
+			const cols = 12;
+			const colWidth = canvas.width / cols;
+			let targetCol = Math.floor(relativeX / colWidth);
+			targetCol = Math.max(0, Math.min(cols - 1, targetCol));
+
+			if (targetCol !== lastTargetCol) {
+				const oldX = player.pos.x;
+				player.pos.x = targetCol;
+				if (collide(arena, player)) {
+					player.pos.x = oldX;
+				} else {
+					lastTargetCol = targetCol;
+					draw();
+				}
+			}
+		}
+
+		//swipe verticale solo giù
+		else if (gesture === 'vertical' && !verticalHandled) {
+			if (deltaY > SWIPE_THRESHOLD_Y) {
+				clearTimeout(longPressTimeout);
+				clearInterval(softDropInterval);
+				playerDropDown();//butta giu il pezzo
+				verticalHandled = true;
+			}
+		}
+
+		e.preventDefault();
+	}, { passive: false });
+
+	//fine tocco
 	canvas.addEventListener("touchend", e => {
-		if(gameover) return;
-		const endX = e.changedTouches[0].clientX;
-		const endY = e.changedTouches[0].clientY;
+		if (gameover) return;
+		clearTimeout(longPressTimeout);
+		clearInterval(softDropInterval);
+		longPressTimeout = null;
+		softDropInterval = null;
 
+		const t = e.changedTouches[0];
+		const endX = t.clientX;
+		const endY = t.clientY;
 		const deltaX = endX - startX;
 		const deltaY = endY - startY;
 
-		//swipe verticale
-		if(deltaY < -SWIPE_THRESHOLD_Y) {
-			playerRotate(1); // swipe su → ruota
-		} else if(deltaY > SWIPE_THRESHOLD_Y) {
-			playerDropDown(); // swipe giù → drop
+		//tap breve deve ruotare ma solo se non era long press ne' swipe
+		if (!gesture && !longPressActive) {
+			if (Math.abs(deltaX) < TAP_THRESHOLD && Math.abs(deltaY) < TAP_THRESHOLD) {
+				playerRotate(1);
+			}
 		}
 
-		//swipe orizzontale
-		if(Math.abs(deltaX) > SWIPE_THRESHOLD_X) {
-			handleSwipe(endX - canvas.offsetLeft);
-		}
+		//reset stato
+		gesture = null;
+		verticalHandled = false;
+		lastTargetCol = null;
+		longPressActive = false;
 
-		//aggiorna start per il prossimo gesto
-		startX = endX;
-		startY = endY;
-	});
+		e.preventDefault();
+	}, { passive: false });
 
-	//gestione swipe orizzontale
-	function handleSwipe(x) {
-		const colWidth = canvas.width / 12;
-		const targetCol = Math.floor(x / colWidth);
-
-		const oldPlayerPosX = player.pos.x;
-		player.pos.x = targetCol;
-
+	//soft drop == scende di 1 riga
+	function playerDropSoft() {
+		player.pos.y++;
 		if (collide(arena, player)) {
-			player.pos.x = oldPlayerPosX;//torna indietro se collide
+			player.pos.y--; //torna su di 1 se collide
+			merge(arena, player);
+			playerReset();
 		}
-
-		draw();//ridisegna
-	}	
+		draw();
+	}
   </script>
 </body>
 </html>
+
 
 
