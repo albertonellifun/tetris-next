@@ -1662,11 +1662,6 @@
 			arena.forEach(row => row.fill(0));
 				
 			resetStats();
-			drawStatsBG();
-			
-			playerReset();
-			update();
-			startMusic();
 			
 			//HIGHSCORE
 			let highScore = 0;
@@ -1679,6 +1674,11 @@
 				statistiche['HIGH'] = highScore;
 			}
 			
+			drawStatsBG();
+			
+			playerReset();
+			update();
+			startMusic();
 			}, 500);
 	}
 	
