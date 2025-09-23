@@ -1784,9 +1784,9 @@
 
 			const cols = 12;
 			const colWidth = canvas.width / cols;
+			const pieceWidth = player.matrix[0].length;
 			let targetCol = Math.floor(relativeX / colWidth);
-			targetCol = Math.max(0, Math.min(cols - 1, targetCol));
-
+			
 			if (targetCol !== lastTargetCol) {
 				const oldX = player.pos.x;
 				player.pos.x = targetCol;
@@ -1855,4 +1855,5 @@
   </script>
 </body>
 </html>
+
 
