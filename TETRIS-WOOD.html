@@ -969,9 +969,9 @@
 		const endX = e.changedTouches[0].clientX;
 		const endY = e.changedTouches[0].clientY;
 
-		if((endY-startY)<-50) { playerRotate(1); startY=endY; }
-		else if((endY-startY)>50) { playerDropDown(); startY=endY; }
-		else if(Math.abs(startX-endX)>20) handleSwipe(endX-canvas.offsetLeft);
+		if((endY-startY)<(window.innerHeight/-10)) { playerRotate(1); startY=endY; }
+		else if((endY-startY)>(window.innerHeight/10)) { playerDropDown(); startY=endY; }
+		else if(Math.abs(startX-endX)>(window.innerWidth/25)) handleSwipe(endX-canvas.offsetLeft);
 	});
 
 	//quando lascio -> resetta start x/y
@@ -999,3 +999,4 @@
   </script>
 </body>
 </html>
+
