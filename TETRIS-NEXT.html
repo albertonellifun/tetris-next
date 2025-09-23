@@ -1633,8 +1633,8 @@
 		//HIGHSCORE
 		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
 			statistiche['HIGH'] = statistiche['PTS'];
-			setCookie("highScore", statistiche['HIGH'], 365)
-			setTimeout(function(){ playHighScore();},2000);
+			setCookie("TetrisNext-HighScore", statistiche['HIGH'], 365)
+			setTimeout(function(){ playHighScore();},2200);
 		}
 	}
 	
@@ -1718,4 +1718,3 @@
   </script>
 </body>
 </html>
-
