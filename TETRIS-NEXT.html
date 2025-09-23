@@ -197,7 +197,6 @@
   <audio id="highScoreSound" preload="auto">
 	<source src="./res/highscore.mp3" type="audio/mpeg">
   </audio>
-  
   <audio id="rowSound" preload="auto">
 	<source src="./res/row.mp3" type="audio/mpeg">
   </audio>
@@ -1578,6 +1577,7 @@
 		}
 	}
 	
+	//HIGHSCORE
 	function playHighScore() {
 		if (isMute) return;
 		const highScoreSound = document.getElementById("highScoreSound");
@@ -1714,11 +1714,7 @@
 	  }catch(e){
 	    console.log(e);
 	  }
-    }
-
-	
-	
-	
+    }	
   </script>
 </body>
 </html>
