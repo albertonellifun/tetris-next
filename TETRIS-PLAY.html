@@ -294,7 +294,7 @@
 	
 	//disegno dei blocchi
 	let currentSkin = 0;
-	const skinList = [ drawRealWoodBlocks ];
+	const skinList = [ drawTetrisBlocks ];
    
 	//colore dei blocchi
 	let currentPalette = 0;
@@ -434,10 +434,11 @@
 		images[index] = img;
 	});
 	
-	function drawRealWoodBlocks(ctx, px, py, value) {
+	
+	function drawTetrisBlocks(ctx, px, py, value) {
 	  ctx.save();
 	  
-	  // riempi con texture di legno
+	  // riempi con texture
 	  if (patterns) {
 		ctx.fillStyle = patterns[value];
 	  } else {
@@ -449,7 +450,8 @@
 	  ctx.strokeStyle = "#000";
 	  ctx.lineWidth = 0.05 * blockSize;
 	  ctx.strokeRect(px * blockSize, py * blockSize, 1 * blockSize, 1 * blockSize);
-
+	  
+	  /*
 	  // effetto 3D con luci/ombre
 	  ctx.strokeStyle = colors[value].bor;
 	  ctx.beginPath();
@@ -460,7 +462,7 @@
 	  ctx.moveTo(px * blockSize + 0.05 * blockSize, py * blockSize);
 	  ctx.lineTo(px * blockSize + 0.05 * blockSize, py * blockSize + 1 * blockSize);
 	  ctx.stroke();
-
+	  
 	  ctx.strokeStyle = colors[value].borInt;
 	  ctx.beginPath();
 	  ctx.moveTo(px * blockSize, py * blockSize + 0.95* blockSize);
@@ -470,7 +472,7 @@
 	  ctx.moveTo(px * blockSize + 0.95* blockSize, py * blockSize);
 	  ctx.lineTo(px * blockSize + 0.95* blockSize, py * blockSize + 1* blockSize);
 	  ctx.stroke();
-	  
+	  */
 	  ctx.restore();
 	}
 	

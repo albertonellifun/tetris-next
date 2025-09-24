@@ -431,6 +431,8 @@
 	});
 	
 	function drawRealWoodBlocks(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  // riempi con texture di legno
 	  if (patterns) {
 		ctx.fillStyle = patterns[value];
@@ -438,7 +440,7 @@
 		ctx.fillStyle = colors[value].col; // fallback se la texture non è ancora caricata
 	  }
 	  ctx.fillRect(px * blockSize, py * blockSize, 1 * blockSize, 1 * blockSize);
-
+	  
 	  // bordo nero per separare i pezzi
 	  ctx.strokeStyle = "#000";
 	  ctx.lineWidth = 0.05 * blockSize;
@@ -464,6 +466,8 @@
 	  ctx.moveTo(px * blockSize + 0.95* blockSize, py * blockSize);
 	  ctx.lineTo(px * blockSize + 0.95* blockSize, py * blockSize + 1* blockSize);
 	  ctx.stroke();
+	  
+	  ctx.restore();
 	}
 	
 	
