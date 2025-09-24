@@ -108,7 +108,7 @@
 	
 	button {
       background: #444;
-      padding: 24px 0;
+      padding: 24px;
       color: white;
       border-radius: 6px;
       cursor: pointer;
@@ -180,6 +180,9 @@
 		background: #666;
 		padding: 0px 8px;	
 	}
+	.hidden { 
+		display: none !important; 
+	}
   </style>
 </head>
 <body>
@@ -215,12 +218,12 @@
   </div>
 
   <div class="controls">
-    <button type="button" id="moveLeft"		class="highlight" 	disabled="disabled"		alt="LEFT ARROW"	onclick="playerMove(-1)">←</button>
-    <button type="button" id="rotate"		class="highlight" 	disabled="disabled"		alt="UP ARROW"		onclick="playerRotate(1)">↻</button>
-	<button type="button" id="moveRight"	class="highlight" 	disabled="disabled"		alt="RIGHT ARROW"	onclick="playerMove(1)">→</button>
-    <button type="button" id="drop"			class="highlight" 	disabled="disabled"		alt="DOWN ARROW"	onclick="playerDrop()">↓</button>
-	<button type="button" id="dropAll"		class="highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
-	<button type="button" id="startGame" 	class="highlight"							alt="ENTER" 		onclick="startGame();this.blur();">▶ START</button>
+    <button type="button" id="moveLeft"		class="big highlight" 	disabled="disabled"		alt="LEFT ARROW"	onclick="playerMove(-1)">←</button>
+    <button type="button" id="rotate"		class="big highlight" 	disabled="disabled"		alt="UP ARROW"		onclick="playerRotate(1)">↻</button>
+	<button type="button" id="moveRight"	class="big highlight" 	disabled="disabled"		alt="RIGHT ARROW"	onclick="playerMove(1)">→</button>
+    <button type="button" id="drop"			class="big highlight" 	disabled="disabled"		alt="DOWN ARROW"	onclick="playerDrop()">↓</button>
+	<button type="button" id="dropAll"		class="big highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
+	<button type="button" id="startGame" 	class="big highlight"							alt="ENTER" 		onclick="startGame();this.blur();">▶ START</button>
 	<div class="full"></div>
 	<button type="button" id="changePalette" 	class="small command"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
 	<button type="button" id="changeSkin" 		class="small command"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
@@ -242,15 +245,26 @@
 	//gestione visibilita pulsanti
 	let currentControlsVisibility = 0;//default
 	function toggleControls(){
-		currentControlsVisibility = (currentControlsVisibility + 1) % 4;
-		//0 = no full screen, controls visible
-		//1 = no full screen, controls hidden
-		//2 = full screen, controls visible
-		//3 = full screen, controls hidden
-		let controlsVisible = currentControlsVisibility % 2 == 0;
-		let fullScreen = currentControlsVisibility > 1;
-		document.querySelectorAll('.controls .small').forEach(function(x){x.style.display = controlsVisible ? 'flex':'none';});
-		if(fullScreen) document.documentElement.requestFullscreen();
+		currentControlsVisibility = (currentControlsVisibility + 1) % 8;
+		const modes = [
+			{ big: true,  small: true,  fs: false }, // 0 = no full screen, all controls visible
+			{ big: true,  small: false, fs: false }, // 1 = no full screen, big controls visible
+			{ big: false, small: true,  fs: false }, // 2 = no full screen, small controls visible
+			{ big: false, small: false, fs: false }, // 3 = no full screen, all controls hidden
+			{ big: true,  small: true,  fs: true  }, // 4 = full screen, all controls visible
+			{ big: true,  small: false, fs: true  }, // 5 = full screen, big controls visible
+			{ big: false, small: true,  fs: true  }, // 6 = full screen, small controls visible
+			{ big: false, small: false, fs: true  }  // 7 = full screen, all controls hidden
+		];
+
+		const mode = modes[currentControlsVisibility];
+		
+		document.querySelectorAll('.controls button').forEach(x => mode.big && mode.small ? x.classList.remove('hidden') : x.classList.add('hidden'));
+		document.querySelectorAll('.controls button.big').forEach(x => mode.big ? x.classList.remove('hidden') : x.classList.add('hidden'));
+		document.querySelectorAll('.controls button.small').forEach(x => mode.small ? x.classList.remove('hidden') : x.classList.add('hidden'));
+		document.querySelectorAll('.controls').forEach(x => !mode.big && !mode.small ? x.classList.add('hidden') : x.classList.remove('hidden'));
+		
+		if(mode.fs) document.documentElement.requestFullscreen();
 		else if(document.fullscreenElement) document.exitFullscreen();
 	}
   
@@ -378,6 +392,7 @@
 	
 	//gestione scramble
 	function scramble(){
+		if(gameover || gamepause) return;
 		let max = arena.length - 1;//19
 		let min = arena.length / 2;//10
 		//riempie
@@ -440,6 +455,7 @@
 	let nextType = null;
 	let musicStarted = false;
 	let gameover = true;
+	let gamepause = false;
 	
 	let arenaStats = createMatrix(7, 22);
 	let arenaNext = createMatrix(7, 5);
@@ -1365,7 +1381,7 @@
     }
 
 	function playerDropDown() {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
 		while (!collide(arena, player)) { player.pos.y++; }
 		player.pos.y--;
 		merge(arena, player);
@@ -1375,7 +1391,7 @@
 	}
 
     function playerDrop() {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
       player.pos.y++;
       if (collide(arena, player)) {
 		player.pos.y--;
@@ -1387,7 +1403,7 @@
     }
 
     function playerMove(dir) {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
       player.pos.x += dir;
       if (collide(arena, player)) {
         player.pos.x -= dir;
@@ -1395,7 +1411,7 @@
     }
 
     function playerRotate(dir) {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
       const pos = player.pos.x;
       let offset = 1;
       rotate(player.matrix, dir);
@@ -1411,7 +1427,7 @@
     }
 
     function rotate(matrix, dir) {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
       for (let y = 0; y < matrix.length; y++) {
         for (let x = 0; x < y; x++) {
           [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
@@ -1422,7 +1438,7 @@
     }
 
     function update(time = 0) {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
       const deltaTime = time - lastTime;
       lastTime = time;
       dropCounter += deltaTime;
@@ -1432,7 +1448,7 @@
     }
 
     function drawNext() {
-	  if(gameover) return;
+	  if(gameover || gamepause) return;
       nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
       drawMatrixToContext(arenaNext, { x: 0, y: 0}, nextCtx, true);
 	  const matrix = createPiece(nextType);
@@ -1620,6 +1636,7 @@
 		else if (event.code === 'KeyE') changeSepia();
 		else if (event.code === 'KeyC') changeScanLines();
 		else if (event.code === 'KeyA') scramble();
+		else if (event.code === 'Backspace') toggleGamePause();
 	});
 	
 	function gameOver() {
@@ -1680,6 +1697,18 @@
 			update();
 			startMusic();
 			}, 500);
+	}
+	
+	//gestione gamepause
+	function toggleGamePause() {
+		gamepause = !gamepause;
+		if (gamepause) {
+			document.body.style = 'filter: grayscale(0.75) contrast(0.75)';
+		} else {
+			document.body.style = '';
+			lastTime = performance.now();//ocho!
+			update(lastTime);
+		}
 	}
 	
 	
@@ -1785,7 +1814,8 @@
 			const cols = 12;
 			const colWidth = canvas.width / cols;
 			let targetCol = Math.floor(relativeX / colWidth);
-			
+			targetCol = Math.max(0, Math.min(cols - 1, targetCol));
+
 			if (targetCol !== lastTargetCol) {
 				const oldX = player.pos.x;
 				player.pos.x = targetCol;
@@ -1854,8 +1884,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-

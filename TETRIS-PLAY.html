@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <link rel="shortcut icon" type="image/x-icon" href="favicon_wood.ico"/>
-  <title>Tetris Next - Wood Edition</title>
+  <title>Tetris Next - Play Edition</title>
   <style>
     body {
       background: #111;
-      color: #fec;
+      color: #fff;
       font-family: monospace;
       display: flex;
       flex-direction: column;
@@ -34,9 +34,13 @@
 
     canvas {
       background: #222;
-      image-rendering: pixelated;
+      xxximage-rendering: pixelated;
       border-radius: 6px;
       display: block;
+	  border-left: 2px solid #444;
+	  border-right: 2px solid #444;
+      border-top: 1px solid #999;
+      border-bottom: 1px solid #444;
     }
 
     .controls {
@@ -49,7 +53,7 @@
 	h1, .controls, .canvas-wrapper {
 	  padding: 6px 12px;
 	  margin: 3px;
-      background: url('./res/wood_bg.png');
+      background: url('./res/t_bg.png');
       background-repeat: repeat;
       border-radius: 12px;
 	  width: calc(100% - 80px);
@@ -106,15 +110,15 @@
 	
 	button {
       background: #444;
-      padding: 24px 0;
-      color: #fec;
+      padding: 24px;
+      color: #fff;
       border-radius: 6px;
       cursor: pointer;
       user-select: none;
 	  flex: 1;
 	  white-space: nowrap;
 	  touch-action: manipulation; 
-	  background: url(./res/wood_black.png);
+	  background: url(./res/t_black.png) no-repeat center/120%;
     }
 	
 	.full {
@@ -129,12 +133,12 @@
 		background: #fff;
 		color: #444;
 		border: 1px solid #000;
-		background: url(./res/wood_white.png);
+		background: url(./res/t_white.png) no-repeat center/120%;
 	}
 	
 	button:active {
       background: #666;
-	  background: url(./res/wood_black.png);
+	  background: url(./res/t_black.png) no-repeat center/120%;
     }
 	
 	
@@ -172,10 +176,10 @@
 	}
 	.val {
 		margin-right: -10px;
-		color: #fec;
+		color: #fff;
 		background: #666;
 		padding: 0px 8px;	
-		background: url(./res/wood_brown.png);
+		background: url(./res/t_white.png) no-repeat center/120%;
 	}
 	.hidden { 
 		display: none !important; 
@@ -186,25 +190,25 @@
   <div id="scanlines-overlay"></div>
   
   <audio id="creditSound" preload="auto">
-	<source src="./res/wood_block_3.mp3" type="audio/mpeg">
+	<source src="./res/credit.mp3" type="audio/mpeg">
   </audio>
   <audio id="bgMusic" loop preload="auto">
-	<source src="./res/wood_loginska.mp3" type="audio/mpeg">
+	<source src="./res/loginska.mp3" type="audio/mpeg">
   </audio>
   <audio id="gameOverSound" preload="auto">
-	<source src="./res/wood_block_3.mp3" type="audio/mpeg">
+	<source src="./res/gameover.mp3" type="audio/mpeg">
   </audio>
   <audio id="highScoreSound" preload="auto">
 	<source src="./res/highscore.mp3" type="audio/mpeg">
   </audio>
   <audio id="rowSound" preload="auto">
-	<source src="./res/wood_block_1.mp3" type="audio/mpeg">
+	<source src="./res/row.mp3" type="audio/mpeg">
   </audio>
   <audio id="dropSound" preload="auto">
-	<source src="./res/wood_block_2.mp3" type="audio/mpeg">
+	<source src="./res/drop.mp3" type="audio/mpeg">
   </audio>
   
-  <h1 onclick="toggleControls()">Tetris Next - Wood Edition</h1>
+  <h1 onclick="toggleControls()">Tetris Next - Play Edition</h1>
   
   <div class="canvas-wrapper">
     <canvas id="tetris" width="240" height="400"></canvas>
@@ -408,15 +412,15 @@
 	
 	//blocchi di legno realistici
 	const imageSources = [
-		"./res/wood_black.png",  	//null==nero
-		"./res/wood_red.png",		// I = rosso
-		"./res/wood_yellow.png",	// J = gialla
-		"./res/wood_violet.png",	// L = viola
-		"./res/wood_blue.png",		// O = blu
-		"./res/wood_cyan.png",		// S - azzurro
-		"./res/wood_green.png",		// T = verde
-		"./res/wood_orange.png",	// Z - arancione
-		"./res/wood_white.png"];	//BIANCO
+		"./res/t_black.png",  	//null==nero
+		"./res/t_red.png",		// I = rosso
+		"./res/t_yellow.png",	// J = gialla
+		"./res/t_violet.png",	// L = viola
+		"./res/t_blue.png",		// O = blu
+		"./res/t_cyan.png",		// S - azzurro
+		"./res/t_green.png",	// T = verde
+		"./res/t_orange.png",	// Z - arancione
+		"./res/t_white.png"];	//BIANCO
 	const images = [];
 	const patterns = [];
 	let loadedCount = 0;
@@ -1041,6 +1045,7 @@
 
 			const cols = 12;
 			const colWidth = canvas.width / cols;
+			const pieceWidth = player.matrix[0].length;
 			let targetCol = Math.floor(relativeX / colWidth);
 			
 			if (targetCol !== lastTargetCol) {
