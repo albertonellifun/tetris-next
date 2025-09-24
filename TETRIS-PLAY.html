@@ -435,6 +435,8 @@
 	});
 	
 	function drawRealWoodBlocks(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  // riempi con texture di legno
 	  if (patterns) {
 		ctx.fillStyle = patterns[value];
@@ -468,6 +470,8 @@
 	  ctx.moveTo(px * blockSize + 0.95* blockSize, py * blockSize);
 	  ctx.lineTo(px * blockSize + 0.95* blockSize, py * blockSize + 1* blockSize);
 	  ctx.stroke();
+	  
+	  ctx.restore();
 	}
 	
 	
@@ -688,11 +692,15 @@
 	  const matrix = createPiece(nextType);
       drawMatrixToContext(matrix, { x: 1, y: 2 }, nextCtx, false);
 	  //NEXT
+	  nextCtx.save();
+	  
 	  nextCtx.fillStyle = colors[8].col;
 	  nextCtx.font = (0.6 * blockSize)+"px Arial Bold";
 	  nextCtx.textAlign = "left";
 	  nextCtx.textBaseline = "middle";
 	  nextCtx.fillText("NEXT", 0.2 * blockSize, 0.6 * blockSize);
+	  
+	  nextCtx.restore();
     }
 
 	//gestione statistiche
@@ -718,6 +726,8 @@
 	}
 	
 	function drawStatsFG() {
+		statsCtx.save();
+		
 		//STATS
 		statsCtx.fillStyle = colors[8].col;
 		statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
@@ -753,6 +763,8 @@
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
 		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2 * blockSize, idx * blockSize + 4.6 * blockSize);
+		
+		statsCtx.restore();
 	}
 	
 	function drawStats() {
@@ -1115,5 +1127,4 @@
 	}
   </script>
 </body>
-
 </html>

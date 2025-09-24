@@ -495,6 +495,8 @@
 	
 	//blocchi di legno
 	function drawWoodBlocks(ctx, px, py, value) {
+		ctx.save(); 
+		
 		const baseColor = colors[value].col;
 		const lightColor = colors[value].bor;    // lato illuminato
 		const darkColor = colors[value].borInt;  // lato in ombra
@@ -542,10 +544,14 @@
 			ctx.lineTo(px + offset*0.9, py + 0.95);
 			ctx.stroke();
 		}
+		
+		ctx.restore();
 	}
 	
 	//blocchi esagonali
 	function drawHexBlocks(ctx, px, py, value) {
+		ctx.save(); 
+		
 		const baseColor = colors[value].col;
 		const lightColor = colors[value].bor;    // lato illuminato
 		const darkColor = colors[value].borInt;  // lato in ombra
@@ -596,11 +602,15 @@
 		for (let i = 1; i < hex.length; i++) ctx.lineTo(hex[i].x, hex[i].y);
 		ctx.closePath();
 		ctx.stroke();
+		
+		ctx.restore();
 	}
 
 	
 	//blocchi 3d
 	function draw3DBlocks(ctx, px, py, value) {
+		ctx.save();
+		
 		const baseColor = colors[value].col;
 		const lightColor = colors[value].bor;    // lato chiaro
 		const darkColor = colors[value].borInt;  // lato scuro
@@ -633,10 +643,14 @@
 		ctx.strokeStyle = '#111';
 		ctx.lineWidth = 0.05;
 		ctx.strokeRect(px, py, 1, 1);
+		
+		ctx.restore();
 	}
 	
 	//piramidi
 	function drawPyramids(ctx, px, py, value) {
+		ctx.save();
+		
 		// Base: colore pieno
 		ctx.fillStyle = colors[value].col;
 		ctx.fillRect(px, py, 1, 1);
@@ -681,11 +695,14 @@
 		ctx.strokeStyle = '#000';
 		ctx.lineWidth = 0.05;
 		ctx.strokeRect(px, py, 1, 1);
+		
+		ctx.restore();
 	}
 	
 	//piramidi di acciaio
 	function drawPyramidBlocks(ctx, px, py, value) {
-	
+		ctx.save();
+		
 		ctx.fillStyle = colors[value].col;
 		ctx.fillRect(px, py, 1, 1);
 		
@@ -750,6 +767,8 @@
 		ctx.strokeStyle = "#111";
 		ctx.lineWidth = 0.05;
 		ctx.strokeRect(px, py, 1, 1);
+		
+		ctx.restore();
 	}
 	
 	function lightenColor(color, percent) {
@@ -771,6 +790,8 @@
 
 	//blocchetti stile block blast 
 	function drawBlockBlastBlocks(ctx, px, py, value) {
+		ctx.save();
+		
 		const baseColor = colors[value].col;      // colore principale
 		const lightColor = colors[value].bor;     // bordo chiaro
 		const darkColor = colors[value].borInt;   // bordo scuro
@@ -813,10 +834,14 @@
 		ctx.lineTo(px + 0.7, py + 0.3);
 		ctx.lineTo(px + 0.7, py + 0.7);
 		ctx.stroke();
+		
+		ctx.restore();
 	}
 
 	//mattoni
 	function drawBricks(ctx, px, py, value) {
+		ctx.save();
+		
 		// Colore di base
         ctx.fillStyle = colors[value].col;;
         ctx.fillRect(px, py, 1, 1);	
@@ -847,10 +872,14 @@
             ctx.stroke();
           }
         }
+		
+		ctx.restore();
 	}
 
 	//X blocks
 	function drawXBlocks(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  ctx.strokeStyle = colors[value].col;
 	  ctx.lineWidth = 0.35;
 	  ctx.beginPath();
@@ -859,10 +888,14 @@
 	  ctx.moveTo(px + 0.8, py + 0.2);
 	  ctx.lineTo(px + 0.2, py + 0.8);
 	  ctx.stroke();
+	  
+	  ctx.restore();
 	}
 	
 	//arrotondati
 	function drawBalls(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  // Crea un gradiente radiale lucido
 	  const grad = ctx.createRadialGradient(px + 0.3, py + 0.3, 0.1, px + 0.5, py + 0.5, 0.8);
 	  grad.addColorStop(0, colors[value].col); // punto luce
@@ -878,10 +911,14 @@
 	  ctx.strokeStyle = "rgba(0, 0, 0, 0.51)";
 	  ctx.lineWidth = 0.03;
 	  ctx.stroke();
+	  
+	  ctx.restore();
 	}
 	
 	//blocchi di vetro
 	function drawGlassBlocks(ctx, px, py, value) {
+		ctx.save();
+		
 		const baseColor = colors[value].col;    // colore principale
 		const lightColor = colors[value].bor;   // più chiaro
 		const darkColor = colors[value].borInt; // più scuro
@@ -941,11 +978,15 @@
 		ctx.strokeStyle = edgeGrad;
 		ctx.lineWidth = 0.03;
 		ctx.strokeRect(px + 0.02, py + 0.02, 0.96, 0.96);
+		
+		ctx.restore();
 	}
 	
 	
 	//sfere lucide
 	function drawRoundBlocks(ctx, px, py, value) {
+		ctx.save();
+		
 		const baseColor = colors[value].col;    // colore principale
 		const lightColor = colors[value].bor;   // bordo chiaro
 		const darkColor = colors[value].borInt; // bordo scuro
@@ -1001,10 +1042,14 @@
 		ctx.beginPath();
 		ctx.arc(cx, cy, r, 0, Math.PI * 2);
 		ctx.fill();
+		
+		ctx.restore();
 	}
 	
 	//squadrati
 	function drawSquares(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  // Gradient quadratino
       const grad = ctx.createLinearGradient(px, py, px + 1, py + 1);
 	  grad.addColorStop(0, colors[value].bor);
@@ -1022,10 +1067,14 @@
       ctx.strokeStyle = '#111';
       ctx.lineWidth = 0.1;
       ctx.strokeRect(px, py, 1, 1);
+	  
+	  ctx.restore();
 	}
 	
 	//lego 
 	function drawLegoBlocks(ctx, px, py, value) {
+		ctx.save();
+		
 		const baseColor = colors[value].col;
 		const darkColor = colors[value].borInt;
 		const lightColor = colors[value].bor;
@@ -1070,11 +1119,15 @@
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.fillText("LEGO", cx, cy);
+		
+		ctx.restore();
 	}
 	
 	
 	//diamanti
 	function drawDiamondBlocks(ctx, px, py, value) {
+		ctx.save();
+		
 		const baseColor = colors[value].col;    // colore principale
 		const lightColor = colors[value].bor;   // bordo chiaro
 		const darkColor = colors[value].borInt; // bordo scuro
@@ -1134,10 +1187,14 @@
 		ctx.moveTo(px + 0.2, py + 0.2);
 		ctx.lineTo(px + 0.8, py + 0.8);
 		ctx.stroke();
+		
+		ctx.restore();
 	}
 
 	//play tetris come
 	function drawTetrisRoundedBlocks(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  const baseColor = colors[value].bor; // colore principale
 	  const darkenColor = value === 0 ? '#333' : colors[value].borInt; // bordo scuro
 	  const lightenColor = colors[value].col; //colore chiaro
@@ -1147,8 +1204,6 @@
       const highlightCurve  = 0.6;
 	  const highlightOpacity= value === 0 ? 0.3 : 0.75;
       
-	  ctx.save();
-	  
 	  // corpo arrotondato con gradiente ---
 	  const grad = ctx.createLinearGradient(px, py, px, py + 1);
 	  grad.addColorStop(0, lightenColor);
@@ -1190,6 +1245,8 @@
 	
 	//ispirato al tetris ufficiale moderno 
     function drawTetrisBlocks(ctx, px, py, value) {
+	  ctx.save();
+	  
 	  const baseColor   = colors[value].col;
 	  const darkenColor = colors[value].borInt;
 	  const borderColor = '#222';
@@ -1198,8 +1255,6 @@
 	  const inset = 0.08;
 	  const gx = px + inset, gy = py + inset;
 	  const gw = 1 - inset * 2, gh = 1 - inset * 2;
-
-	  ctx.save();
 
 	  // corpo con gradiente verticale più dettagliato
 	  const grad = ctx.createLinearGradient(gx, gy, gx, gy + gh);
@@ -1454,11 +1509,15 @@
 	  const matrix = createPiece(nextType);
       drawMatrixToContext(matrix, { x: 1, y: 2 }, nextCtx, false);
 	  //NEXT
+	  nextCtx.save();
+	  
 	  nextCtx.fillStyle = colors[8].col;
 	  nextCtx.font = "0.6px Arial Bold";
 	  nextCtx.textAlign = "left";
 	  nextCtx.textBaseline = "middle";
 	  nextCtx.fillText("NEXT", 0.2, 0.6);
+	  
+	  nextCtx.restore();
     }
 
 	//gestione statistiche
@@ -1484,6 +1543,8 @@
 	}
 	
 	function drawStatsFG() {
+		statsCtx.save();
+		
 		//STATS
 		statsCtx.fillStyle = colors[8].col;
 		statsCtx.font = "0.6px Arial Bold";
@@ -1519,6 +1580,8 @@
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
 		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2, idx+4.6);
+		
+		statsCtx.restore();
 	}
 	
 	function drawStats() {
