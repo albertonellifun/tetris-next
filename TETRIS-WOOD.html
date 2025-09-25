@@ -434,7 +434,7 @@
 	  ctx.save();
 	  
 	  // riempi con texture di legno
-	  if (patterns) {
+	  if (patterns && patterns[value]) {
 		ctx.fillStyle = patterns[value];
 	  } else {
 		ctx.fillStyle = colors[value].col; // fallback se la texture non è ancora caricata
@@ -1122,4 +1122,5 @@
 	}
   </script>
 </body>
+
 </html>
