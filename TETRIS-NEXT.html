@@ -377,13 +377,25 @@
 		{ col:'#fff',bor:'#ddd',borInt:'#bbb'}, //BIANCO
 	];
 	
+	let colorsOfficial = [
+		{col:'#333',bor:'#111',borInt:'#000'}, //null==nero
+		{col:'#01EDFA',bor:'#01CDDA',borInt:'#01ADBA'}, // I - azzurro
+		{col:'#0077D3',bor:'#0057B3',borInt:'#003793'}, // J - blu
+		{col:'#FFC82E',bor:'#DFA80E',borInt:'#BF880E'}, // L - arancione
+		{col:'#FEFB34',bor:'#DEDB14',borInt:'#BEBB04'}, // O - giallo
+		{col:'#53DA3F',bor:'#33BA1F',borInt:'#139A0F'}, // S - verde
+		{col:'#DD0AB2',bor:'#BD0A92',borInt:'#9D0A72'}, // T - viola
+		{col:'#FD3F59',bor:'#DD1F39',borInt:'#BD0F19'}, // Z - rosso
+		{col:'#fff',bor:'#ddd',borInt:'#bbb'}, //BIANCO
+	];
+	
 	//disegno dei blocchi
 	let currentSkin = 0;
 	const skinList = [ drawBlockBlastBlocks, drawPyramids, drawBricks, drawXBlocks, drawSquares, drawBalls, draw3DBlocks, drawHexBlocks, drawWoodBlocks, drawLegoBlocks, drawPyramidBlocks, drawTetrisBlocks, drawRoundBlocks, drawGlassBlocks, drawDiamondBlocks, drawTetrisRoundedBlocks ];
    
 	//colore dei blocchi
 	let currentPalette = 0;
-	const paletteList = [colorsBright, colorsSoft, colorsBlueSimple, colorsDark, colorsRed, colorsGreen, colorsBlue, colorsCGA];
+	const paletteList = [colorsBright, colorsSoft, colorsBlueSimple, colorsDark, colorsRed, colorsGreen, colorsBlue, colorsCGA, colorsOfficial];
 
 	let colors = paletteList[currentPalette];
 	
