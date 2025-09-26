@@ -1,5 +1,13 @@
 # Tetris Next
-Tetris game in HTML CSS and JavaScript Legacy - also available in "Wood Edition" ;)
+Tetris game in HTML CSS and JavaScript Legacy
+[link](https://albertonellifun.github.io/tetris-next/TETRIS-NEXT.html)
+
+- also available in the "Wood Edition" – don’t worry, no trees were harmed and the Amazon stays untouched ;-)
+[link](https://albertonellifun.github.io/tetris-next/TETRIS-WOOD.html)
+
+- ... and introducing the "Play Edition" with SVG textures, a feast for your eyes!
+[link](https://albertonellifun.github.io/tetris-next/TETRIS-PLAY.html)
+
 
 ## Licenza
 
