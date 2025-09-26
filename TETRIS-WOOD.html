@@ -220,7 +220,7 @@
 	<button type="button" id="moveRight"	class="big highlight" 	disabled="disabled"		alt="RIGHT ARROW"	onclick="playerMove(1)">→</button>
     <button type="button" id="drop"			class="big highlight" 	disabled="disabled"		alt="DOWN ARROW"	onclick="playerDrop()">↓</button>
 	<button type="button" id="dropAll"		class="big highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
-	<button type="button" id="startGame" 	class="big highlight"							alt="ENTER" 		onclick="startGame();this.blur();">▶ START</button>
+	<button type="button" id="startGame" 	class="big highlight"							alt="ENTER" 		onclick="startGame();this.blur();">&#9654; | &#9208;</button>
 	<div class="full"></div>
 	<button type="button" id="changePalette" 	class="small command hidden"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
 	<button type="button" id="changeSkin" 		class="small command hidden"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
@@ -847,7 +847,7 @@
     
 	function disableButtons(val){
 		//start invertito
-		document.getElementById('startGame').disabled=!val;
+		//document.getElementById('startGame').disabled=!val;
 
 		document.getElementById('moveLeft').disabled=val;
 		document.getElementById('rotate').disabled=val;
@@ -897,7 +897,13 @@
 	
 	
 	function startGame() {
-		if (!gameover) return;
+		//se non gameover -> pause
+		if (!gameover) {
+			toggleGamePause();
+			return;
+		}
+		
+		//se gameover -> START
 		playSound('creditSound');		
 		setTimeout(function(){
 			disableButtons(false);
@@ -935,7 +941,7 @@
 			
 			playerReset();
 			update();
-			startMusic();
+			startMusic(true);
 			}, 500);
 	}
 	
@@ -944,10 +950,12 @@
 		gamepause = !gamepause;
 		if (gamepause) {
 			document.body.style = 'filter: grayscale(0.75) contrast(0.75)';
+			stopMusic();
 		} else {
 			document.body.style = '';
 			lastTime = performance.now();//ocho!
 			update(lastTime);
+			startMusic(false);
 		}
 	}
 	
@@ -1122,5 +1130,4 @@
 	}
   </script>
 </body>
-
 </html>
