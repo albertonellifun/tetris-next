@@ -8,6 +8,9 @@ Tetris game in HTML CSS and JavaScript Legacy
 - ... and introducing the "Play Edition" with SVG textures, a feast for your eyes!
 [link](https://albertonellifun.github.io/tetris-next/TETRIS-PLAY.html)
 
+- ... and now the "Legacy Edition" – runs even on your grandma’s washing machine!
+[link](https://albertonellifun.github.io/tetris-next/TETRIS-NEXT-LEGACY.html)
+
 
 ## Licenza
 
