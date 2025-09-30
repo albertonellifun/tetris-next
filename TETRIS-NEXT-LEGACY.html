@@ -10,179 +10,212 @@
       background: #111;
       color: white;
       font-family: monospace;
+      display: -webkit-box;
       display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
       flex-direction: column;
+      -webkit-box-align: center;
       align-items: center;
-	  justify-content: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      -webkit-user-select: none;
       user-select: none;
       margin: 0;
       height: 98%;
-	  height: calc(100vh - 10px);
-	  text-align: center;
-	  overflow: hidden;
-	  font-size: 16px;
+      height: calc(100vh - 10px);
+      text-align: center;
+      overflow: hidden;
+      font-size: 16px;
     }
-	
+    
     .canvas-wrapper {
+      display: -webkit-box;
       display: flex;
+      -webkit-box-align: center;
       align-items: center;
-	  justify-content: center;
+      -webkit-box-pack: center;
+      justify-content: center;
       gap: 10px;
-	  flex: 1;
+      -webkit-box-flex: 1;
+      flex: 1;
     }
 
     canvas {
       background: #222;
+      image-rendering: -webkit-optimize-contrast;
       image-rendering: pixelated;
       border-radius: 6px;
       display: block;
     }
 
     .controls {
-	  display: flex;
-	  justify-content: center;
-	  flex-wrap: wrap;
+      display: -webkit-box;
+      display: flex;
+      -webkit-box-pack: center;
+      justify-content: center;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
       gap: 4px 8px;
     }
-	
-	h1, .controls, .canvas-wrapper {
-	  padding: 6px 12px;
-	  margin: 3px;
+    
+    h1, .controls, .canvas-wrapper {
+      padding: 6px 12px;
+      margin: 3px;
+      background: -webkit-linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet, red);
       background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet, red);
       background-size: 400% 400%;
+      -webkit-animation: rainbow 16s linear infinite;
       animation: rainbow 16s linear infinite;
       border-radius: 12px;
-	  width: calc(100% - 80px);
-	  overflow: hidden;
-	}
-	
-	.right-wrapper {
-	  display: flex; 
-	  flex-direction: column;
-	  justify-content: space-between;
-	  height: 100%;
-	  width: auto;
-	  min-width: 56px;
-	  max-width: 112px;
-	}
-	
-	@media(min-width:700px) {
-		.right-wrapper {
-			width: 15%;
-			max-width: 15%;
-		}
-	}
-	
-	@media(max-width:700px) {
-		h1, .controls, .canvas-wrapper {
-			margin: 2px;
-			width: calc(100% - 40px);
-		}
-		h1, button {
-			height: 25px;
-		}
-		h1, .val, key {
-			line-height: 25px;
-		}
-		
-		#tetris {
-			max-width: 70%;
-		}
-	}
-	
-	#tetris {
-		height: 100%;
-		aspect-ratio: 3 / 5;
-	}
-	
-	#next {
-		width: 100%;
-		height: auto;
-		max-height: 20%;
-	}
-	#stats {
-		width: 100%;
-		height: auto;
-		max-height: 75%;
-	}
-	
-	button {
+      width: calc(100% - 80px);
+      overflow: hidden;
+    }
+    
+    .right-wrapper {
+      display: -webkit-box;
+      display: flex; 
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      flex-direction: column;
+      -webkit-box-pack: justify;
+      justify-content: space-between;
+      height: 100%;
+      width: auto;
+      min-width: 56px;
+      max-width: 112px;
+    }
+    
+    @media(min-width:700px) {
+      .right-wrapper {
+        width: 15%;
+        max-width: 15%;
+      }
+    }
+    
+    @media(max-width:700px) {
+      h1, .controls, .canvas-wrapper {
+        margin: 2px;
+        width: calc(100% - 40px);
+      }
+      h1, button {
+        height: 25px;
+      }
+      h1, .val, key {
+        line-height: 25px;
+      }
+      
+      #tetris {
+        max-width: 70%;
+      }
+    }
+    
+    #tetris {
+      height: 100%;
+      width: auto;
+    }
+    
+    #next {
+      width: 100%;
+      height: auto;
+      max-height: 20%;
+    }
+    #stats {
+      width: 100%;
+      height: auto;
+      max-height: 75%;
+    }
+    
+    button {
       background: #444;
       padding: 24px;
       color: white;
       border-radius: 6px;
       cursor: pointer;
+      -webkit-user-select: none;
       user-select: none;
-	  flex: 1;
-	  white-space: nowrap;
-	  touch-action: manipulation; 
+      -webkit-box-flex: 1;
+      flex: 1;
+      white-space: nowrap;
+      -ms-touch-action: manipulation;
+      touch-action: manipulation; 
     }
-	
-	.full {
-		flex: 1 1 100%;
-	}
-	
-	.small {
-		padding: 2px 12px;
-	}
-	
-	.highlight {
-		background: #fff;
-		color: #444;
-		border: 1px solid #000;
-	}
-	
-	button:active {
+    
+    .full {
+      -webkit-box-flex: 1;
+      flex: 1 1 100%;
+    }
+    
+    .small {
+      padding: 2px 12px;
+    }
+    
+    .highlight {
+      background: #fff;
+      color: #444;
+      border: 1px solid #000;
+    }
+    
+    button:active {
       background: #666;
+    }
+
+    @-webkit-keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
 
     @keyframes rainbow {
       0% { background-position: 0% 50%; }
       100% { background-position: 100% 50%; }
     }
+    
+    #scanlines-overlay {
+      display:none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        transparent,
+        transparent 0px,
+        rgba(0, 0, 0, 0.5) 1px,
+        transparent 2px
+      );
+      background-size: 100% 4px;
+      opacity: 1;
+    }
+    
+    button:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    
+    .command {
+      display: -webkit-box;
+      display: flex;
+      -webkit-box-pack: justify;
+      justify-content: space-between;
+      -webkit-box-align: center;
+      align-items: center;
+    }
 	
+    .key {
+      margin-left: -10px;
+    }
 	
+    .val {
+      margin-right: -10px;
+      color: #fff;
+      background: #666;
+      padding: 0px 8px;	
+    }
 	
-	#scanlines-overlay {
-	  display:none;
-	  position: absolute;
-	  top: 0;
-	  left: 0;
-	  right: 0;
-	  bottom: 0;
-	  pointer-events: none;
-	  background: repeating-linear-gradient(
-		transparent,
-		transparent 0px,
-		rgba(0, 0, 0, 0.5) 1px,
-		transparent 2px
-	  );
-	  background-size: 100% 4px;
-	  opacity: 1;
-	}
-	
-	button:focus {
-	  outline: none;
-	  box-shadow: none;
-	}
-	
-	.command {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.key {
-		margin-left: -10px;
-	}
-	.val {
-		margin-right: -10px;
-		color: #fff;
-		background: #666;
-		padding: 0px 8px;	
-	}
-	.hidden { 
-		display: none !important; 
-	}
+    .hidden { 
+      display: none !important; 
+    }
   </style>
 </head>
 <body>
@@ -223,7 +256,7 @@
 	<button type="button" id="moveRight"	class="big highlight" 	disabled="disabled"		alt="RIGHT ARROW"	onclick="playerMove(1)">→</button>
     <button type="button" id="drop"			class="big highlight" 	disabled="disabled"		alt="DOWN ARROW"	onclick="playerDrop()">↓</button>
 	<button type="button" id="dropAll"		class="big highlight" 	disabled="disabled"		alt="SPACE"			onclick="playerDropDown()">⇓</button>
-	<button type="button" id="startGame" 	class="big highlight"							alt="ENTER" 		onclick="startGame();this.blur();">&#9654; | &#9208;</button>
+	<button type="button" id="startGame" 	class="big highlight"							alt="ENTER" 		onclick="startGame();this.blur();">&#9654; ||</button>
 	<div class="full"></div>
 	<button type="button" id="changePalette" 	class="small command"	alt="P" 	onclick="changePalette()"><span class="key">PALETTE</span><span class="val">0</span></button>
 	<button type="button" id="changeSkin" 		class="small command"	alt="S" 	onclick="changeSkin()"><span class="key">SKIN</span><span class="val">0</span></button>
@@ -2125,6 +2158,30 @@
 		}
 	}
 	
+	if (!Array.prototype.fill) {
+      Array.prototype.fill = function(value) {
+        for (var i = 0; i < this.length; i++) {
+          this[i] = value;
+        }
+        return this;
+      };
+    }
+	
+	if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+      };
+    }
+
 	function addClass(el, className) {
 	  if (el.className.indexOf(className) === -1) {
 		el.className += (el.className ? " " : "") + className;
