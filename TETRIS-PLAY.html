@@ -526,8 +526,8 @@
 			}
 			
 			//aggiorna stats
-			statistiche['TOT'] = statistiche['TOT'] + linesToClear.length;
-			statistiche['PTS'] = statistiche['PTS'] + 
+			statistiche['ROWS'] = statistiche['ROWS'] + linesToClear.length;
+			statistiche['POINTS'] = statistiche['POINTS'] + 
 				( linesToClear.length == 1 ? 50 : linesToClear.length == 2 ? 150 : linesToClear.length == 3 ? 400 : linesToClear.length == 4 ? 900 : 0);
 			drawStats();
 		}
@@ -707,23 +707,84 @@
 
 	//gestione statistiche
 	let statistiche = null;
-	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7, TOT:8, PTS:8, HIGH:7 };
+	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7, ROWS:8, POINTS:8, HIGH:7, BLOCKS:8 };
 	
 	function resetStats() {
-		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':0};
+		//statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'ROWS':0, 'POINTS':0, 'HIGH':0};
+		statistiche = {'I':0,'J':0,'L':0,'Z':0,'O':0,'S':0,'T':0, 'ROWS':0, 'POINTS':0, 'HIGH':0, 'BLOCKS':0};
 	}
 	
 	function drawStatsBG() {
 		statsCtx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
+		
 		let idx = 2;
 		for (let key in statistiche) {
 			//HIGHSCORE da mostrare in stats
-			if(key !== 'HIGH') {
+			if(key !== 'ROWS' && key !== 'POINTS' && key !== 'HIGH' && key !== 'BLOCKS') {
 				let color = colorMap[key] ?? 0;
-				arenaStats[idx][1] = color;
-				idx+=2;
+				//arenaStats[idx][1] = color;
+				let X = 0;
+				switch(key) {
+					case 'L':
+						X = 0;
+						arenaStats[idx][X+1] = color;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx][X+3] = color;
+						arenaStats[idx+1][X+1] = color;
+						break;
+					case 'I':
+						X = 0;
+						arenaStats[idx][X+1] = color;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx][X+3] = color;
+						arenaStats[idx][X+4] = color;
+						break;
+					case 'T':
+						X = 0;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx+1][X+1] = color;
+						arenaStats[idx+1][X+2] = color;
+						arenaStats[idx+1][X+3] = color;
+						break;
+					case 'S':
+						X = 2;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx][X+3] = color;
+						arenaStats[idx+1][X+1] = color;
+						arenaStats[idx+1][X+2] = color;
+						break;
+					case 'Z':
+						X = 2;
+						arenaStats[idx][X+1] = color;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx+1][X+2] = color;
+						arenaStats[idx+1][X+3] = color;
+						break;
+					case 'O':
+						X = 0;
+						arenaStats[idx][X+1] = color;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx+1][X+1] = color;
+						arenaStats[idx+1][X+2] = color;
+						break;
+					case 'J':
+						X = 2;
+						arenaStats[idx][X+1] = color;
+						arenaStats[idx][X+2] = color;
+						arenaStats[idx][X+3] = color;
+						arenaStats[idx+1][X+3] = color;
+						break;
+					default:
+						arenaStats[idx][1] = color;
+				}
+			idx+=2;
 			}
+			
 		}
+		//ROWS/POINTS/PCS
+		arenaStats[idx+1][1] = colorMap['BLOCKS'];
+		arenaStats[idx+2][1] = colorMap['ROWS'];
+		arenaStats[idx+3][1] = colorMap['POINTS'];
 		drawMatrixToContext(arenaStats, { x: 0, y: 0 }, statsCtx, true);
 	}
 	
@@ -739,32 +800,61 @@
 	
 		//BLOCKS
 		let idx = 2;
+		let toright=true;
 		for (let key in statistiche) {
-			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
+			if(key !== 'ROWS' && key !== 'POINTS' && key !== 'HIGH' && key !== 'BLOCKS') {
 				let color = colorMap[key] ?? 0;
-				statsCtx.fillStyle = colors[color].col;
+				statsCtx.fillStyle = colors[8].col;//colors[color].col;
 				statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
 				statsCtx.textAlign = "left";
 				statsCtx.textBaseline = "middle";
-				statsCtx.fillText(" " + key + " → " + statistiche[key] + " BLOCKS", 2 * blockSize, idx * blockSize + 0.6 * blockSize);
+
+				switch(key){
+					case 'I':
+						statsCtx.fillText(" → " + statistiche[key], 60 + 2 * blockSize, 2.6 * blockSize);
+						break;
+					case 'J': 
+						statsCtx.fillText(statistiche[key] + " ← ", -6 + 2 * blockSize, 4.6 * blockSize);
+						break;
+					case 'L': 
+						statsCtx.fillText(" → " + statistiche[key], 40 + 2 * blockSize, 6.6 * blockSize);
+						break;
+					case 'Z': 
+						statsCtx.fillText(statistiche[key] + " ← ", -6 + 2 * blockSize, 8.6 * blockSize);
+						break;
+					case 'O': 
+						statsCtx.fillText(" → " + statistiche[key], 20 + 2 * blockSize, 10.6 * blockSize);
+						break;
+					case 'S': 
+						statsCtx.fillText(statistiche[key] + " ← ", -6 + 2 * blockSize, 13.6 * blockSize);
+						break;
+					case 'T': 
+						statsCtx.fillText(" → " + statistiche[key], 40 + 2 * blockSize, 15.6 * blockSize);
+						break;
+				}
+				//statsCtx.fillText(" " + key + " → " + statistiche[key] + " BLOCKS", 2 * blockSize, idx * blockSize + 0.6 * blockSize);
 				idx+=2;
 			}
 		}
-		
-		//ROWS/POINTS
+		//ROWS/POINTS/PCS
 		statsCtx.fillStyle = colors[8].col;
 		statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
+		
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(" → "+statistiche['TOT'] + " ROWS", 2 * blockSize, idx * blockSize + 0.6 * blockSize);
+		statsCtx.fillText(" → "+statistiche['BLOCKS'] + " BLOCKS", 2 * blockSize, 17.6 * blockSize);
+		
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(" → "+statistiche['PTS'] + " PTS", 2 * blockSize, idx * blockSize + 2.6 * blockSize);
+		statsCtx.fillText(" → "+statistiche['ROWS'] + " ROWS", 2 * blockSize, 18.6 * blockSize);
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText(" → "+statistiche['POINTS'] + " PTS", 2 * blockSize, 19.6 * blockSize);
 		//HIGHSCORE
 		statsCtx.fillStyle = colors[7].col;
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2 * blockSize, idx * blockSize + 4.6 * blockSize);
+		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2 * blockSize, 20.6 * blockSize);
 		
 		statsCtx.restore();
 	}
@@ -778,7 +868,7 @@
       if (!nextType) {
         nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
       }
-	  
+	  statistiche['BLOCKS']++;
 	  statistiche[nextType]++;
 	  drawStats();
 	  
@@ -892,8 +982,8 @@
 		stopMusic();
 		disableButtons(true);
 		//HIGHSCORE
-		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
-			statistiche['HIGH'] = statistiche['PTS'];
+		if(isNaN(statistiche['HIGH']) || statistiche['POINTS']>statistiche['HIGH']) {
+			statistiche['HIGH'] = statistiche['POINTS'];
 			setCookie("TetrisNext-HighScore", statistiche['HIGH'], 365)
 			playHighScore();
 		} else {
@@ -1137,6 +1227,4 @@
 	}
   </script>
 </body>
-
 </html>
-
