@@ -1353,8 +1353,8 @@
 			}
 			
 			//aggiorna stats
-			statistiche['TOT'] = statistiche['TOT'] + linesToClear.length;
-			statistiche['PTS'] = statistiche['PTS'] + 
+			statistiche['ROWS'] = statistiche['ROWS'] + linesToClear.length;
+			statistiche['POINTS'] = statistiche['POINTS'] + 
 				( linesToClear.length == 1 ? 50 : linesToClear.length == 2 ? 150 : linesToClear.length == 3 ? 400 : linesToClear.length == 4 ? 900 : 0);
 			drawStats();
 		}
@@ -1534,23 +1534,36 @@
 
 	//gestione statistiche
 	let statistiche = null;
-	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7, TOT:8, PTS:8, HIGH:7 };
+	const colorMap = { I:1, J:2, L:3, O:4, S:5, T:6, Z:7, ROWS:8, POINTS:8, HIGH:7, BLOCKS:8 };
 	
 	function resetStats() {
-		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'TOT':0, 'PTS':0, 'HIGH':0};
+		statistiche = {'T':0,'J':0,'L':0,'O':0,'S':0,'Z':0,'I':0, 'ROWS':0, 'POINTS':0, 'HIGH':0, 'BLOCKS':0};
 	}
 	
 	function drawStatsBG() {
+	
+		//ordina statistiche
+		const chiaviEscluse = ['ROWS', 'POINTS', 'HIGH', 'BLOCKS'];
+		let entries = Object.entries(statistiche).filter(([k, _]) => !chiaviEscluse.includes(k));
+		entries.sort((a, b) => b[1] - a[1]);
+		let statisticheOrdinate = Object.fromEntries(entries);
+		for (let chiave of chiaviEscluse) statisticheOrdinate[chiave] = statistiche[chiave];
+		statistiche = statisticheOrdinate;
+	
 		statsCtx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
 		let idx = 2;
 		for (let key in statistiche) {
 			//HIGHSCORE da mostrare in stats
-			if(key !== 'HIGH') {
+			if(key !== 'ROWS' && key !== 'POINTS' && key !== 'HIGH' && key !== 'BLOCKS') {
 				let color = colorMap[key] ?? 0;
 				arenaStats[idx][1] = color;
 				idx+=2;
 			}
 		}
+		arenaStats[idx][1] = colorMap['BLOCKS'];
+		arenaStats[idx+1][1] = colorMap['ROWS'];
+		arenaStats[idx+2][1] = colorMap['POINTS'];
+		
 		drawMatrixToContext(arenaStats, { x: 0, y: 0 }, statsCtx, true);
 	}
 	
@@ -1567,7 +1580,7 @@
 		//BLOCKS
 		let idx = 2;
 		for (let key in statistiche) {
-			if(key !== 'TOT' && key !== 'PTS' && key !== 'HIGH') {
+			if(key !== 'ROWS' && key !== 'POINTS' && key !== 'HIGH' && key !== 'BLOCKS') {
 				let color = colorMap[key] ?? 0;
 				statsCtx.fillStyle = colors[color].col;
 				statsCtx.font = "0.6px Arial Bold";
@@ -1578,20 +1591,24 @@
 			}
 		}
 		
+		let blockSize = 1;
 		//ROWS/POINTS
 		statsCtx.fillStyle = colors[8].col;
-		statsCtx.font = "0.6px Arial Bold";
+		statsCtx.font = (0.6 * blockSize)+"px Arial Bold";
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(" → "+statistiche['TOT'] + " ROWS", 2, idx+0.6);
+		statsCtx.fillText(" → "+statistiche['BLOCKS'] + " BLOCKS", 2 * blockSize, idx * blockSize + 0.6 * blockSize);
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(" → "+statistiche['PTS'] + " PTS", 2, idx+2.6);
+		statsCtx.fillText(" → "+statistiche['ROWS'] + " ROWS", 2 * blockSize, idx * blockSize + 1.6 * blockSize);
+		statsCtx.textAlign = "left";
+		statsCtx.textBaseline = "middle";
+		statsCtx.fillText(" → "+statistiche['POINTS'] + " POINTS", 2 * blockSize, idx * blockSize + 2.6 * blockSize);
 		//HIGHSCORE
 		statsCtx.fillStyle = colors[7].col;
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2, idx+4.6);
+		statsCtx.fillText("\u{1F451} → "+statistiche['HIGH'] + " POINTS", 1.2 * blockSize, idx * blockSize + 4.6 * blockSize);
 		
 		statsCtx.restore();
 	}
@@ -1605,7 +1622,7 @@
       if (!nextType) {
         nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
       }
-	  
+	  statistiche['BLOCKS']++;
 	  statistiche[nextType]++;
 	  drawStats();
 	  
@@ -1719,8 +1736,8 @@
 		stopMusic();
 		disableButtons(true);
 		//HIGHSCORE
-		if(isNaN(statistiche['HIGH']) || statistiche['PTS']>statistiche['HIGH']) {
-			statistiche['HIGH'] = statistiche['PTS'];
+		if(isNaN(statistiche['HIGH']) || statistiche['POINTS']>statistiche['HIGH']) {
+			statistiche['HIGH'] = statistiche['POINTS'];
 			setCookie("TetrisNext-HighScore", statistiche['HIGH'], 365)
 			playHighScore();
 		} else {
@@ -1966,5 +1983,4 @@
 	}
   </script>
 </body>
-
 </html>
