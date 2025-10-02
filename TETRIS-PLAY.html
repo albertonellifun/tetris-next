@@ -800,7 +800,6 @@
 	
 		//BLOCKS
 		let idx = 2;
-		let toright=true;
 		for (let key in statistiche) {
 			if(key !== 'ROWS' && key !== 'POINTS' && key !== 'HIGH' && key !== 'BLOCKS') {
 				let color = colorMap[key] ?? 0;
@@ -854,7 +853,7 @@
 		statsCtx.fillStyle = colors[7].col;
 		statsCtx.textAlign = "left";
 		statsCtx.textBaseline = "middle";
-		statsCtx.fillText(/*"&#128081; 👑 \u{1F451}"*/ "\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2 * blockSize, 20.6 * blockSize);
+		statsCtx.fillText("\u{1F451} → "+statistiche['HIGH'] + " PTS", 1.2 * blockSize, 20.6 * blockSize);
 		
 		statsCtx.restore();
 	}
@@ -872,11 +871,14 @@
 	  statistiche[nextType]++;
 	  drawStats();
 	  
-      player.matrix = createPiece(nextType);
-      player.pos.y = 0;
-      player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
       nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
       drawNext();
+	  
+	  player.matrix = createPiece(nextType);
+      player.pos.y = 0;
+      player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+	  draw();
+	  
       if (collide(arena, player)) {
 		gameOver();
       }
@@ -969,6 +971,28 @@
 		}
 	}
 	
+	function resetArenas() {
+		arenaStats = createMatrix(7, 22);
+		arenaNext = createMatrix(7, 5);
+		arena = createMatrix(12, 20);
+			
+		arenaStats.forEach(row => row.fill(0));
+		arenaNext.forEach(row => row.fill(0));
+		arena.forEach(row => row.fill(0));
+	}
+	
+	function resetHighScore() {
+		//HIGHSCORE
+		let highScore = 0;
+		let savedHigh = getCookie("TetrisNext-HighScore");
+		if (savedHigh) {
+			try{
+				highScore = parseInt(savedHigh);
+			} catch(e) {
+			}
+			statistiche['HIGH'] = highScore;
+		}
+	}
 	
 	function startGame() {
 		//se non gameover -> pause
@@ -979,43 +1003,28 @@
 		
 		//se gameover -> START
 		playSound('creditSound');		
+		
+		resetArenas();
+		resetStats();
+		resetHighScore();
+		
+		disableButtons(false);
+		gameover=false;
+		linesCleared = 0;
+		nextType = null;
+		musicStarted = false;
+		
+		playerReset();
+		
+		//inizio del gioco
 		setTimeout(function(){
-			disableButtons(false);
-			gameover=false;
+			startMusic(true);
 			
 			dropCounter = 0;
 			dropInterval = 1000;
 			lastTime = 0;
-			linesCleared = 0;
-			nextType = null;
-			musicStarted = false;
-		
-			arenaStats = createMatrix(7, 22);
-			arenaNext = createMatrix(7, 5);
-			arena = createMatrix(12, 20);
 			
-			arenaStats.forEach(row => row.fill(0));
-			arenaNext.forEach(row => row.fill(0));
-			arena.forEach(row => row.fill(0));
-				
-			resetStats();
-			
-			//HIGHSCORE
-			let highScore = 0;
-			let savedHigh = getCookie("TetrisNext-HighScore");
-			if (savedHigh) {
-				try{
-					highScore = parseInt(savedHigh);
-				} catch(e) {
-				}
-				statistiche['HIGH'] = highScore;
-			}
-			
-			drawStatsBG();
-			
-			playerReset();
 			update();
-			startMusic(true);
 			}, 500);
 	}
 	
@@ -1135,7 +1144,6 @@
 
 			const cols = 12;
 			const colWidth = canvas.width / cols;
-			const pieceWidth = player.matrix[0].length;
 			let targetCol = Math.floor(relativeX / colWidth);
 			
 			if (targetCol !== lastTargetCol) {

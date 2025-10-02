@@ -1626,11 +1626,13 @@
 	  statistiche[nextType]++;
 	  drawStats();
 	  
+      nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
+      drawNext();
       player.matrix = createPiece(nextType);
       player.pos.y = 0;
       player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
-      nextType = 'TJLOSZI'[(Math.random() * 7) | 0];
-      drawNext();
+
+      draw();
       if (collide(arena, player)) {
 		gameOver();
       }
@@ -1725,6 +1727,29 @@
 	
 	
 	
+	function resetArenas() {
+		arenaStats = createMatrix(7, 22);
+		arenaNext = createMatrix(7, 5);
+		arena = createMatrix(12, 20);
+			
+		arenaStats.forEach(row => row.fill(0));
+		arenaNext.forEach(row => row.fill(0));
+		arena.forEach(row => row.fill(0));
+	}
+	
+	function resetHighScore() {
+		//HIGHSCORE
+		let highScore = 0;
+		let savedHigh = getCookie("TetrisNext-HighScore");
+		if (savedHigh) {
+			try{
+				highScore = parseInt(savedHigh);
+			} catch(e) {
+			}
+			statistiche['HIGH'] = highScore;
+		}
+	}
+	
 	function startGame() {
 		//se non gameover -> pause
 		if (!gameover) {
@@ -1734,43 +1759,28 @@
 		
 		//se gameover -> START
 		playSound('creditSound');		
+		
+		resetArenas();
+		resetStats();
+		resetHighScore();
+		
+		disableButtons(false);
+		gameover=false;
+		linesCleared = 0;
+		nextType = null;
+		musicStarted = false;
+		
+		playerReset();
+		
+		//inizio del gioco
 		setTimeout(function(){
-			disableButtons(false);
-			gameover=false;
+			startMusic(true);
 			
 			dropCounter = 0;
 			dropInterval = 1000;
 			lastTime = 0;
-			linesCleared = 0;
-			nextType = null;
-			musicStarted = false;
-		
-			arenaStats = createMatrix(7, 22);
-			arenaNext = createMatrix(7, 5);
-			arena = createMatrix(12, 20);
 			
-			arenaStats.forEach(row => row.fill(0));
-			arenaNext.forEach(row => row.fill(0));
-			arena.forEach(row => row.fill(0));
-				
-			resetStats();
-			
-			//HIGHSCORE
-			let highScore = 0;
-			let savedHigh = getCookie("TetrisNext-HighScore");
-			if (savedHigh) {
-				try{
-					highScore = parseInt(savedHigh);
-				} catch(e) {
-				}
-				statistiche['HIGH'] = highScore;
-			}
-			
-			drawStatsBG();
-			
-			playerReset();
 			update();
-			startMusic(true);
 			}, 500);
 	}
 	
@@ -1891,7 +1901,6 @@
 			const cols = 12;
 			const colWidth = canvas.width / cols;
 			let targetCol = Math.floor(relativeX / colWidth);
-			targetCol = Math.max(0, Math.min(cols - 1, targetCol));
 
 			if (targetCol !== lastTargetCol) {
 				const oldX = player.pos.x;
