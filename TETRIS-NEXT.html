@@ -1671,29 +1671,6 @@
 		}
 	}
 	
-	function playGameOver() {
-		if (isMute) return;
-		const gameOverSound = document.getElementById("gameOverSound");
-		if (gameOverSound) {
-		  gameOverSound.volume = 0.5;
-		  gameOverSound.play().catch((e) => {
-			console.warn("🔇 gameOverSound bloccata:", e);
-		  });
-		}
-	}
-	
-	//HIGHSCORE
-	function playHighScore() {
-		if (isMute) return;
-		const highScoreSound = document.getElementById("highScoreSound");
-		if (highScoreSound) {
-		  highScoreSound.volume = 0.5;
-		  highScoreSound.play().catch((e) => {
-			console.warn("🔇 highScoreSound bloccata:", e);
-		  });
-		}
-	}
-
     
 	function disableButtons(val){
 		//start invertito
@@ -1739,9 +1716,9 @@
 		if(isNaN(statistiche['HIGH']) || statistiche['POINTS']>statistiche['HIGH']) {
 			statistiche['HIGH'] = statistiche['POINTS'];
 			setCookie("TetrisNext-HighScore", statistiche['HIGH'], 365)
-			playHighScore();
+			playSound('highScoreSound');
 		} else {
-			playGameOver();
+			playSound('gameOverSound');
 		}
 	}
 	
